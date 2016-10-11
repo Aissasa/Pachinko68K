@@ -22,6 +22,8 @@ Main:
     
 GameLoop:
     
+    ;jsr SetFrameBeginTime
+
     jsr HandleInput
     
     jsr UpdateBallPosition
@@ -30,6 +32,8 @@ GameLoop:
     jsr DrawBall
 
     jsr PaintScreenBuffer
+
+    ;jsr WaitToEndFrame
 
     jmp GameLoop          
     
@@ -82,10 +86,12 @@ MoveBallToLeft:
     cmp.b   #(TRUE), (BallDropped)
     beq     NoBallUpdate                ; change this after making the game work
 
+    ;ball moved
     move.b  #(TRUE), (BallMoved)
 
     move.l  (BallXPosition),d0
     lsl.l   #8,d0
+
     sub.l   #(BALL_X_VELOCITY), d0
     move.l  d0, (BallXPositionFixed)
 
@@ -96,14 +102,47 @@ MoveBallToRight:
     cmp.b   #(TRUE), (BallDropped)
     beq     NoBallUpdate                ; change this after making the game work
 
+    ;ball moved
     move.b  #(TRUE), (BallMoved)
 
     move.l  (BallXPosition),d0
     lsl.l   #8,d0
+    
     add.l   #(BALL_X_VELOCITY), d0
     move.l  d0, (BallXPositionFixed)
 
     jmp     NoBallUpdate
+
+
+SetFrameBeginTime:
+
+    ;get current time
+    move.l  #(GET_TIME_COMMAND), d0
+    Trap    #15
+    ;set FrameBeginTime
+    move.l  d1, (FrameBeginTime)
+
+    rts
+
+
+WaitToEndFrame:
+
+    move.l  (FrameBeginTime),d2
+
+.LoopAgain:
+    ;get current time
+    move.l  #(GET_TIME_COMMAND), d0
+    Trap    #15
+    
+    ;get DeltaTime in d1
+    sub.l   d2,d1
+
+    cmp.l   #(TIME_PER_FRAME), d1
+    blt     .LoopAgain
+
+    rts
+
+
 
 
     include "InputHandler.x68"
@@ -118,6 +157,9 @@ BallBitmap          INCBIN  "ironBall.bmp"
 ;input
 PlayerInput         dc.l    0 ;nothing
 
+;frame rate
+FrameBeginTime  dc.l    0
+
 ;ball variables
 BallCalls           dc.l    NoBallUpdate, DropBall, MoveBallToLeft, MoveBallToRight
 BallDropped         dc.b    (FALSE)
@@ -130,6 +172,7 @@ BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
     END    START
 
         
+
 
 
 

@@ -33,6 +33,7 @@ BALL_X_VELOCITY				EQU $250
 
 
 ;commands
+GET_TIME_COMMAND			EQU 8		;get current time trap code
 INPUT_COMMAND               EQU 19      ;get input keys    
 SET_OUTPUT_WINDOW_COMMAND   EQU 33      ;set output trap code
 SET_PEN_COLOR_COMMAND       EQU 80      ;set pen color trap code
@@ -70,6 +71,10 @@ RIGHT_ARROW EQU $27
 SPACE_KEY_LOCATION   EQU 16
 LEFT_ARROW_LOCATION  EQU 8
 RIGHT_ARROW_LOCATION EQU 0
+
+;frame rate
+TIME_PER_FRAME		 EQU 100
+
 
 
 
