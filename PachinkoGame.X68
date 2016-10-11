@@ -22,7 +22,7 @@ Main:
     
 GameLoop:
     
-    ;jsr SetFrameBeginTime
+    jsr SetFrameBeginTime
 
     jsr HandleInput
     
@@ -33,7 +33,7 @@ GameLoop:
 
     jsr PaintScreenBuffer
 
-    ;jsr WaitToEndFrame
+    jsr WaitToEndFrame
 
     jmp GameLoop          
     
