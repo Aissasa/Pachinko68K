@@ -17,7 +17,7 @@ Main:
     jsr SetOutputWindow 
     jsr EnableDoubleBuffer
     jsr DrawAllBackground
-    ;jsr DrawBall
+    jsr DrawBallFirstTime
     jsr PaintScreenBuffer
     
 GameLoop:
@@ -47,64 +47,11 @@ SetOutputWindow:
     rts
 
     
-HandleInput:  
-
-    ;reset PlayerInput
-    move.l  #0,(PlayerInput)
-    ;Set the inputs    
-    move.l  #(INPUT_COMMAND),d0
-    ;d1: $00202527 => space, left arrow, right arrow
-    ;move.l  $20<<$16+$25<<$8+$27,d1
-    move.l  #(SPACE_KEY),d1
-    lsl.l   #8,d1
-    move.b  #(LEFT_ARROW),d1
-    lsl.l   #8,d1
-    move.b  #(RIGHT_ARROW),d1
-
-    Trap    #15
-
-    ;check if ball is droped, if yes skip
-    cmpi.b  #(TRUE),(BallDropped)
-    beq     EndHandleInput
-
-    ;check the pressed key and call subroutines accordingly
-    btst.l  #(SPACE_KEY_LOCATION), d1       
-    bne     DropBallInput
-
-    btst.l  #(LEFT_ARROW_LOCATION), d1       
-    bne     MoveBallToLeftInput
-
-    btst.l  #(RIGHT_ARROW_LOCATION), d1       
-    bne     MoveBallToRightInput
-
-EndHandleInput:
-
-    rts
-
-DropBallInput:
-
-    move.l #1,(PlayerInput)
-
-    jmp EndHandleInput
-
-MoveBallToLeftInput:
-    
-    ;if both arrows are pressed, do nothing
-    btst.l  #(RIGHT_ARROW_LOCATION), d1       
-    bne     EndHandleInput
-
-    move.l #2,(PlayerInput)
-
-    jmp     EndHandleInput
-
-MoveBallToRightInput:
-    
-    move.l #3,(PlayerInput)  
-
-    jmp     EndHandleInput
-  
 
 UpdateBallPosition:
+
+    ;initialize ball moved to false
+    move.b  #(FALSE), (BallMoved)
 
     ;depending on user input, call drop or Move
     move.l  (PlayerInput), d0
@@ -126,30 +73,40 @@ DropBall:
 
     ;add drop ball code
     
+    move.b  #(TRUE), (BallDropped)
+
     jmp     NoBallUpdate
 
 MoveBallToLeft:
+
+    cmp.b   #(TRUE), (BallDropped)
+    beq     NoBallUpdate                ; change this after making the game work
+
+    move.b  #(TRUE), (BallMoved)
 
     move.l  (BallXPosition),d0
     lsl.l   #8,d0
     sub.l   #(BALL_X_VELOCITY), d0
     move.l  d0, (BallXPositionFixed)
-    ;lsr.l   #8,d0
-    ;move.l  d0, (BallXPosition)
 
     jmp     NoBallUpdate
 
 MoveBallToRight:
 
+    cmp.b   #(TRUE), (BallDropped)
+    beq     NoBallUpdate                ; change this after making the game work
+
+    move.b  #(TRUE), (BallMoved)
+
     move.l  (BallXPosition),d0
     lsl.l   #8,d0
     add.l   #(BALL_X_VELOCITY), d0
     move.l  d0, (BallXPositionFixed)
-    ;lsr.l   #8,d0
-    ;move.l  d0, (BallXPosition)
 
     jmp     NoBallUpdate
 
+
+    include "InputHandler.x68"
     include "drawingModule.X68"
 
 
@@ -164,6 +121,7 @@ PlayerInput         dc.l    0 ;nothing
 ;ball variables
 BallCalls           dc.l    NoBallUpdate, DropBall, MoveBallToLeft, MoveBallToRight
 BallDropped         dc.b    (FALSE)
+BallMoved           dc.b    (FALSE)
 BallXPosition       dc.l    (BALL_INITIAL_X_POS)     
 BallXPositionFixed  dc.l    (BALL_INITIAL_X_POS<<FRACTION_BITS)
 BallYPosition       dc.l    (BALL_INITIAL_Y_POS)     
@@ -172,6 +130,11 @@ BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
     END    START
 
         
+
+
+
+
+
 
 
 

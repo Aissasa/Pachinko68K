@@ -10,16 +10,30 @@ DrawAllBackground:
 
 DrawBackgroundChunk:
     
+    cmp.b #(FALSE),(BallMoved)
+    beq .DontDraw
+    
     jsr SetBgDrawParams
     jsr DrawPic
 
+.DontDraw:
     rts
 
+DrawBallFirstTime:
+
+    move.b  #(TRUE), (BallMoved)
+
+    jmp     DrawBall
+
 DrawBall:
+
+    cmp.b #(FALSE),(BallMoved)
+    beq .DontDraw
 
     jsr SetBallDrawParams
     jsr DrawPic
 
+.DontDraw:
     rts
 
 

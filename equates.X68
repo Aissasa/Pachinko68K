@@ -47,6 +47,7 @@ OFFSET_TO_PIXEL_ARRAY       EQU $0A      ;the offset to the address containing t
 OFFSET_IMAGE_WIDTH          EQU $12		 ;the offset to the address containing the image width
 OFFSET_IMAGE_HEIGHT         EQU $16		 ;the offset to the address containing the image height
 
+
 ;Stack pointers for drawing chunks
 FIRST_PIXEL_ADDRESS_STACK_OFFSET    EQU 36
 IMAGE_WIDTH_STACK_OFFSET            EQU 32
