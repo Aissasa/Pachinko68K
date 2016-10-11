@@ -86,14 +86,20 @@ MoveBallToLeft:
     cmp.b   #(TRUE), (BallDropped)
     beq     NoBallUpdate                ; change this after making the game work
 
-    ;ball moved
-    move.b  #(TRUE), (BallMoved)
+    ;check if in bounds
+    cmp.l   #(TOP_LEFT_BOARD_X_POS), (BallXPosition)
+    ble     .DontMove
 
     move.l  (BallXPosition),d0
     lsl.l   #8,d0
 
     sub.l   #(BALL_X_VELOCITY), d0
     move.l  d0, (BallXPositionFixed)
+
+    ;ball moved
+    move.b  #(TRUE), (BallMoved)
+
+.DontMove:
 
     jmp     NoBallUpdate
 
@@ -102,14 +108,20 @@ MoveBallToRight:
     cmp.b   #(TRUE), (BallDropped)
     beq     NoBallUpdate                ; change this after making the game work
 
-    ;ball moved
-    move.b  #(TRUE), (BallMoved)
+    ;check if in bounds
+    cmp.l   #(BOTTOM_RIGHT_BOARD_X_POS-BALL_WIDTH), (BallXPosition)
+    bge     .DontMove
 
     move.l  (BallXPosition),d0
     lsl.l   #8,d0
     
     add.l   #(BALL_X_VELOCITY), d0
     move.l  d0, (BallXPositionFixed)
+
+    ;ball moved
+    move.b  #(TRUE), (BallMoved)
+
+.DontMove:
 
     jmp     NoBallUpdate
 
