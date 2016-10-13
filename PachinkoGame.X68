@@ -50,7 +50,6 @@ SetOutputWindow:
 
     rts
 
-    
 
 UpdateBallPosition:
 
@@ -80,16 +79,11 @@ EndBallUpdate:
 
 DropBall:
 
-    ;add drop ball code
-    
     move.b  #(TRUE), (BallDropped)
 
     jmp     EndBallUpdate
 
 MoveBallToLeft:
-
-    ;cmp.b   #(TRUE), (BallDropped)
-    ;beq     EndBallUpdate                ; change this after making the game work
 
     ;check if in bounds
     cmp.l   #(TOP_LEFT_BOARD_X_POS), (BallXPosition)
@@ -109,9 +103,6 @@ MoveBallToLeft:
     jmp     EndBallUpdate
 
 MoveBallToRight:
-
-    ;cmp.b   #(TRUE), (BallDropped)
-    ;beq     EndBallUpdate                ; change this after making the game work
 
     ;check if in bounds
     cmp.l   #(BOTTOM_RIGHT_BOARD_X_POS-BALL_WIDTH), (BallXPosition)
@@ -145,10 +136,36 @@ BallDropping:
 
 .MoveOnToPegs:
     ;check collisions with pegs here *************************************
-    jsr		CheckPegCollision
-    cmp.l 	#(TRUE), d0
-    bne		.NotColliding
 
+    lea 	PegsXs, a1
+	lea 	PegsYs, a2
+    move.l 	(NumberOfPegs), d7
+
+.NextPeg:
+	
+	;get current peg
+	move.l (LoopCounter), d0
+	lsl.l 	#2, d0
+	move.l 	(a1, d0), -(sp) ;push y to the stack
+	move.l 	(a2, d0), -(sp) ;push x to the stack
+
+    jsr		CheckPegCollision
+    ;free stack
+    add.l 	#(STACK_OFFSET_IN_PEG_COL), sp
+
+    cmp.l 	#(TRUE), d0		;if colliding, end the loop
+    beq 	.EndPegLoop
+
+    add.l 	#1, (LoopCounter) 
+    sub.l 	#1, d7			;else, if there are other oegs, check them, else no collision in this frame
+    bne		.NextPeg
+
+    ;reinit loop counter
+    move.l 	#0, (LoopCounter)
+
+    jmp 	.NotColliding
+
+.EndPegLoop:
     ;check if it just collided
     cmp.b 	#(TRUE), (BallJustCollided)
     bne 	.JustPegCollided
@@ -270,15 +287,19 @@ BallYPosition       dc.l    (BALL_INITIAL_Y_POS)
 BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
 BallXVelocity       dc.l    (BALL_INIT_X_VELOCITY)
 BallYVelocity       dc.l    (BALL_INIT_Y_VELOCITY)
-PegsXs				dc.l 	538, 0
-PegsYs				dc.l 	309, 0
-ClosestPegX			dc.l 	538
-ClosestPegY			dc.l 	309
 
+PegsXs				dc.l 	538, 458, 589
+PegsYs				dc.l 	309, 354, 219
+ClosestPegX			dc.l 	0
+ClosestPegY			dc.l 	0
+NumberOfPegs		dc.l 	(PegsYs-PegsXs)
+LoopCounter			dc.l 	0
 
     END    START
 
         
+
+
 
 
 

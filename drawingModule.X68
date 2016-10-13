@@ -317,8 +317,6 @@ SwapBytes:
     rts
 
 
-;BackgroundBitmap  INCBIN "bg.bmp"
-
         
 
 

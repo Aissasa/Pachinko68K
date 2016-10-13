@@ -31,8 +31,8 @@ CheckPegCollision:
 	move.l	(BallYPosition), d1
 	add.l 	#(BALL_RADIUS), d1 	;shift to center
 
-	move.l	(PegsXs),d2
-	move.l 	(PegsYs),d3
+	move.l	CURRENT_PEG_X_STACK_OFFSET(sp),d2
+	move.l 	CURRENT_PEG_Y_STACK_OFFSET(sp),d3
 
 	;check if we even should do collision check
 	;dy is first
@@ -71,7 +71,10 @@ CheckPegCollision:
 	cmp.l	#(MIN_DX_TO_CHECK_COLLISION), d4
 	bgt		.DidntCollide
 
-	;****************************************************************************todo store the closest peg coor
+	;store the closest peg coor
+	move.l	CURRENT_PEG_X_STACK_OFFSET(sp),(ClosestPegX)
+	move.l 	CURRENT_PEG_Y_STACK_OFFSET(sp),(ClosestPegY)
+
 	;if we're here. we check for collision
 	move.l	d4,d0	;dx
 	mulu.w 	d4,d0	;d0 = dx^2
