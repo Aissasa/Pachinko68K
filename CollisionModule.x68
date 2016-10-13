@@ -1,6 +1,28 @@
 ;Collision stuff file
 
-CheckCollision:
+CheckWallCollision:
+
+	;check if in bounds
+    cmp.l   #(TOP_LEFT_BOARD_X_POS), (BallXPosition)
+    ble     .Collided
+
+    cmp.l   #(BOTTOM_RIGHT_BOARD_X_POS-BALL_WIDTH), (BallXPosition)
+    bge     .Collided
+
+    move.l 	#(FALSE),d0
+
+    jmp	.EndCheck
+
+.Collided:
+
+	move.l 	#(TRUE), d0
+
+.EndCheck:
+
+	rts
+
+
+CheckPegCollision:
 	
 	;movem.l	ALL_REG, -(sp)
 	;set params
@@ -15,13 +37,13 @@ CheckCollision:
 	;check if we even should do collision check
 	;dy is first
 	cmp.l	d1,d3 
-	bge		.SubBallYFromPegY ; if peg y bigger
+	bge		.SubBallYPegY ; if peg y bigger
 	
 	sub.l	d3,d1
 	move.l	d1,d5				;dy
 	jmp		.CheckDy
 
-.SubBallYFromPegY:
+.SubBallYPegY:
 
 	sub.l	d1,d3
 	move.l 	d3, d5				;dy
@@ -33,13 +55,13 @@ CheckCollision:
 
 	;dx is second
 	cmp.l	d0,d2 
-	bge		.SubBallXFromPegX ; if peg x bigger
+	bge		.SubBallXPegX ; if peg x bigger
 	
 	sub.l	d2,d0
 	move.l	d0,d4				;dx
 	jmp		.CheckDx
 
-.SubBallXFromPegX:
+.SubBallXPegX:
 
 	sub.l	d0,d2
 	move.l 	d2, d4				;dx
@@ -49,7 +71,7 @@ CheckCollision:
 	cmp.l	#(MIN_DX_TO_CHECK_COLLISION), d4
 	bgt		.DidntCollide
 
-	***************************************************todo store the closest peg coor
+	;****************************************************************************todo store the closest peg coor
 	;if we're here. we check for collision
 	move.l	d4,d0	;dx
 	mulu.w 	d4,d0	;d0 = dx^2
@@ -88,7 +110,20 @@ CheckCollision:
 	rts
 
 
-BounceBallOff:
+BounceBallOffWall:
+
+	move.l 	(BallXVelocity), d0
+	muls.w 	#(EIGHT_TENTH), d0
+    asr.l   #(FRACTION_BITS),d0
+
+    neg.l 	d0
+    move.l 	d0, (BallXVelocity)
+
+    rts
+
+
+
+BounceBallOffPeg:
 
 	;set tangent vect
 	move.l 	(ClosestPegY),d0
@@ -179,15 +214,13 @@ BounceBallOff:
 	sub.l 	d0, d2					;d2 = NewXvel = Xvel - 2 * Xper
 	sub.l 	d1, d3					;d3 = NewYvel = Yvel - 2 * Yper
 
-	muls.w 	#(EIGHT_TENTH), d2
+	muls.w 	#(EIGHT_TENTH), d2		;soften collision
     asr.l   #(FRACTION_BITS),d2	
     muls.w 	#(ONE_TENTH), d3
     asr.l   #(FRACTION_BITS),d3
 
 
-
 	;update the velocity
-
 	move.l 	d2, (BallXVelocity)
 	move.l 	d3, (BallYVelocity)
 

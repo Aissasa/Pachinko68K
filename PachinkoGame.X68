@@ -132,45 +132,55 @@ MoveBallToRight:
 
 
 BallDropping:
-    
-    ;check collisions with pegs here *************************************
-    jsr		CheckCollision
 
+	jsr		CheckWallCollision
+	cmp.l 	#(TRUE), d0
+	bne		.MoveOnToPegs 
+
+	cmp.b 	#(TRUE), (BallJustCollided)
+    bne 	.JustWallCollided
+
+    jmp 	.ContinueBallUpdate
+
+
+.MoveOnToPegs:
+    ;check collisions with pegs here *************************************
+    jsr		CheckPegCollision
     cmp.l 	#(TRUE), d0
     bne		.NotColliding
 
     ;check if it just collided
-    cmp.b 	#(FALSE), (BallJustCollided)
-    beq 	.JustCollided
+    cmp.b 	#(TRUE), (BallJustCollided)
+    bne 	.JustPegCollided
 
-    jmp 	.ContinueCheckingCol
+    jmp 	.ContinueBallUpdate
 
 .NotColliding:
 
 	move.b 	#(FALSE), (BallJustCollided)
-	jmp 	.ContinueCheckingCol
+	jmp 	.ContinueBallUpdate
 
-.JustCollided:	
+.JustWallCollided:	
 
 	;bounce
-    ;move.l  (BallYVelocity), d0
-    ;lsl.l   #(FRACTION_BITS),d0
-    ;mulu.w 	#(EIGHT_TENTH), d0
-    ;lsr.l   #(FRACTION_BITS),d0
-    ;lsr.l   #(FRACTION_BITS),d0
-    ;neg.l   d0
-    ;move.l 	d0, (BallYVelocity)
-
-    jsr BounceBallOff
+    jsr BounceBallOffWall
 
 	move.b 	#(TRUE), (BallJustCollided)
 	jmp 	.DontMove
 
-.ContinueCheckingCol:
+.JustPegCollided:	
+
+	;bounce
+    jsr BounceBallOffPeg
+
+	move.b 	#(TRUE), (BallJustCollided)
+	jmp 	.DontMove
+
+.ContinueBallUpdate:
 .SkipBounceOffPeg:
 
     cmp.l   #(BOTTOM_RIGHT_BOARD_Y_POS-BALL_HEIGHT), (BallYPosition)
-    bge     .DontMove ; bounce instead
+    bge     .DontMove ;reached destination, do something ***********************************
 
     ;update x pos
     move.l  (BallXPosition),d0
@@ -269,6 +279,7 @@ ClosestPegY			dc.l 	231
     END    START
 
         
+
 
 
 
