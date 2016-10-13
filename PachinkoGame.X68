@@ -270,15 +270,16 @@ BallYPosition       dc.l    (BALL_INITIAL_Y_POS)
 BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
 BallXVelocity       dc.l    (BALL_INIT_X_VELOCITY)
 BallYVelocity       dc.l    (BALL_INIT_Y_VELOCITY)
-PegsXs				dc.l 	402, 0
-PegsYs				dc.l 	231, 0
-ClosestPegX			dc.l 	402
-ClosestPegY			dc.l 	231
+PegsXs				dc.l 	538, 0
+PegsYs				dc.l 	309, 0
+ClosestPegX			dc.l 	538
+ClosestPegY			dc.l 	309
 
 
     END    START
 
         
+
 
 
 

@@ -113,8 +113,8 @@ CheckPegCollision:
 BounceBallOffWall:
 
 	move.l 	(BallXVelocity), d0
-	muls.w 	#(EIGHT_TENTH), d0
-    asr.l   #(FRACTION_BITS),d0
+	muls.w 	#(HALF), d0		
+    asr.l   #(FRACTION_BITS),d0		;soften collision
 
     neg.l 	d0
     move.l 	d0, (BallXVelocity)
@@ -214,7 +214,7 @@ BounceBallOffPeg:
 	sub.l 	d0, d2					;d2 = NewXvel = Xvel - 2 * Xper
 	sub.l 	d1, d3					;d3 = NewYvel = Yvel - 2 * Yper
 
-	muls.w 	#(EIGHT_TENTH), d2		;soften collision
+	muls.w 	#(HALF), d2		;soften collision
     asr.l   #(FRACTION_BITS),d2	
     muls.w 	#(ONE_TENTH), d3
     asr.l   #(FRACTION_BITS),d3

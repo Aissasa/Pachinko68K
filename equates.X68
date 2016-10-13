@@ -15,40 +15,37 @@ EIGHT_TENTH					EQU 205
 HALF						EQU 128
 
 ;output window
-OUTPUT_WINDOW_WIDTH         EQU 800		;the output screen width in pixels
-OUTPUT_WINDOW_HEIGHT        EQU 598		;the output screen height in pixels
+OUTPUT_WINDOW_WIDTH         EQU 1071		;the output screen width in pixels
+OUTPUT_WINDOW_HEIGHT        EQU 800			;the output screen height in pixels
 
 ;pachinko board dimesions and key points
-TOP_LEFT_BOARD_X_POS        EQU 232
-TOP_LEFT_BOARD_Y_POS        EQU 30
-BOTTOM_RIGHT_BOARD_X_POS    EQU 566
-BOTTOM_RIGHT_BOARD_Y_POS    EQU 499
+TOP_LEFT_BOARD_X_POS        EQU 313
+TOP_LEFT_BOARD_Y_POS        EQU 42
+BOTTOM_RIGHT_BOARD_X_POS    EQU 757
+BOTTOM_RIGHT_BOARD_Y_POS    EQU 666
 BOARD_WIDTH                 EQU (BOTTOM_RIGHT_BOARD_X_POS-TOP_LEFT_BOARD_X_POS)
 BOARD_HEIGHT                EQU (BOTTOM_RIGHT_BOARD_Y_POS-TOP_LEFT_BOARD_Y_POS)
 
 ;ball
-BALL_WIDTH					EQU 40
-BALL_HEIGHT					EQU 40
-BALL_RADIUS					EQU 20
-BALL_OFFSET					EQU 40
+BALL_WIDTH					EQU 30
+BALL_HEIGHT					EQU 30
+BALL_RADIUS					EQU 15
 BALL_INITIAL_X_POS			EQU TOP_LEFT_BOARD_X_POS
 BALL_INITIAL_Y_POS			EQU TOP_LEFT_BOARD_Y_POS
-BALL_CENTER_X_POS			EQU (BALL_INITIAL_X_POS+(BALL_WIDTH/2))
-BALL_CENTER_Y_POS			EQU (BALL_INITIAL_Y_POS+(BALL_HEIGHT/2))
 
 
-BALL_SLIDE_VELOCITY			EQU $200
+BALL_SLIDE_VELOCITY			EQU $250
 
-BALL_Y_ACCELERATION			EQU $10
+BALL_Y_ACCELERATION			EQU $15
 
-BALL_INIT_X_VELOCITY		EQU 0	   ****************************** make random between -2,2
+BALL_INIT_X_VELOCITY		EQU 0	   ;****************************** make random between -2,2***************************************************************
 BALL_INIT_Y_VELOCITY		EQU 0
 
 
 ;pegs
-PEG_WIDTH					EQU 4
-PEG_HEIGHT					EQU 4
-PEG_RADIUS					EQU 2
+PEG_WIDTH					EQU 14
+PEG_HEIGHT					EQU 14
+PEG_RADIUS					EQU 7
 
 
 ;collision
