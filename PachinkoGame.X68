@@ -153,13 +153,15 @@ BallDropping:
 .JustCollided:	
 
 	;bounce
-    move.l  (BallYVelocity), d0
-    lsl.l   #(FRACTION_BITS),d0
-    mulu.w 	#(EIGHT_TENTH), d0
-    lsr.l   #(FRACTION_BITS),d0
-    lsr.l   #(FRACTION_BITS),d0
-    neg.l   d0
-    move.l 	d0, (BallYVelocity)
+    ;move.l  (BallYVelocity), d0
+    ;lsl.l   #(FRACTION_BITS),d0
+    ;mulu.w 	#(EIGHT_TENTH), d0
+    ;lsr.l   #(FRACTION_BITS),d0
+    ;lsr.l   #(FRACTION_BITS),d0
+    ;neg.l   d0
+    ;move.l 	d0, (BallYVelocity)
+
+    jsr BounceBallOff
 
 	move.b 	#(TRUE), (BallJustCollided)
 	jmp 	.DontMove
@@ -169,6 +171,13 @@ BallDropping:
 
     cmp.l   #(BOTTOM_RIGHT_BOARD_Y_POS-BALL_HEIGHT), (BallYPosition)
     bge     .DontMove ; bounce instead
+
+    ;update x pos
+    move.l  (BallXPosition),d0
+    lsl.l   #8,d0
+    
+    add.l   (BallXVelocity), d0
+    move.l  d0, (BallXPositionFixed)
 
 
     ;update Y vel
@@ -253,10 +262,17 @@ BallXVelocity       dc.l    (BALL_INIT_X_VELOCITY)
 BallYVelocity       dc.l    (BALL_INIT_Y_VELOCITY)
 PegsXs				dc.l 	402, 0
 PegsYs				dc.l 	231, 0
+ClosestPegX			dc.l 	402
+ClosestPegY			dc.l 	231
+
 
     END    START
 
         
+
+
+
+
 
 
 

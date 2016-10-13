@@ -104,8 +104,6 @@ SetBallDrawParams:
     
     ;set chunk start position
     move.l  #0,d2 
-    swap    d2
-    move.w  #0,d2
     
     ;set chunk width and height
     move.l  #(BALL_WIDTH),d3
