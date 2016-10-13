@@ -93,13 +93,12 @@ SetBallDrawParams:
     ;update the y position
     move.l  d7, (BallYPosition)
           
-    ;add.l   (BallYPositionFixed)>>FRACTION_BITS,d1
     swap    d1
-    ;move.w  (BallXPositionFixed)>>FRACTION_BITS,d1
+
     move.l  (BallXPositionFixed),d7
     lsr.l   #(FRACTION_BITS),d7
     move.w  d7, d1
-    ;update the y position
+    ;update the x position
     move.l  d7, (BallXPosition)
 
     
