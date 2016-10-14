@@ -20,12 +20,12 @@ Main:
     jsr EnableDoubleBuffer
     jsr DrawAllBackground
     jsr DrawBallFirstTime
+    jsr UpdateScoreLed
     jsr PaintScreenBuffer
     
 GameLoop:
     
     jsr SetFrameBeginTime
-
     jsr HandleInput
     
     jsr UpdateBallPosition
@@ -285,7 +285,7 @@ BallDropping:
 	;set sound to play to a1
 	lea 	ScoreSound, a1
 	jsr 	PlaySound
-	
+
 	move.b 	#(TRUE), (HaveToRestart)
     jmp     EndBallUpdate
 
@@ -309,6 +309,11 @@ RestartGame:
 	;reset velocity
 	move.l 	#0, BallXVelocity
 	move.l 	#0, BallYVelocity
+
+
+	jsr OverrideScore
+	jsr UpdateScoreLed
+
 
 
     jmp   	EndBallUpdate
@@ -371,6 +376,7 @@ RandomizeXVel:
     include	"CollisionModule.x68"
     include	"RandomNumberGenerator.x68"
     include	"Math.x68"
+    include	"Led.x68"
 
 
 
@@ -417,7 +423,7 @@ PegsYs				dc.l 	167, 167, 167
 					dc.l 	297, 297, 297, 297
 					dc.l 	430, 430, 430
 					dc.l 	564, 564, 564, 564
-					dc.l 	698, 698, 698, 698			; for the lower part of the board			
+					dc.l 	700, 700, 700, 700			; for the lower part of the board			
 
 ClosestPegX			dc.l 	0
 ClosestPegY			dc.l 	0
@@ -427,6 +433,10 @@ LoopCounter			dc.l 	0
 Rand 				ds.l 	1
 
 HaveToRestart 		dc.l 	(FALSE)
+
+LedDigitsTable 		dc.b 	$3f, $06,$5b, $4f, $66, $6d, $7d, $07, $7f, $67
+CurrentLedStartX 	dc.l  	0
+CurrentLedStartY 	dc.l  	0
 
 UsedBalls 			dc.l 	0
 
@@ -438,6 +448,9 @@ EndScoresInGame
     END    START
 
         
+
+
+
 
 
 

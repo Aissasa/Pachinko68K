@@ -22,11 +22,22 @@ DrawBackgroundChunk:
     cmp.b #(FALSE),(BallMoved)
     beq .DontDraw
     
+    ;override the ball
     jsr SetBgDrawParams
     jsr DrawPic
 
+
+
 .DontDraw:
     rts
+
+OverrideScore:
+
+    ;override the score
+    jsr SetBgDrawParamsSc
+    jsr DrawPic
+
+    rts    
 
 DrawBallFirstTime:
 
@@ -79,12 +90,36 @@ SetBgDrawParams:
     ;set chunk start position
     move.l  (BallYPosition),d2              ;y          
     swap    d2
-    add.l  (BallXPosition),d2              ;x
+    add.l  (BallXPosition),d2               ;x
     
     ;set chunk width and height
-    move.l  #(BALL_WIDTH),d3                ;add offset maybe
+    move.l  #(BALL_WIDTH),d3                
     swap    d3
-    move.w  #(BALL_HEIGHT),d3               ;add offset maybe
+    move.w  #(BALL_HEIGHT),d3               
+    
+    rts
+
+SetBgDrawParamsSc:
+
+    lea BackgroundBitmap, a0
+
+    ;set draw start position   
+    move.l  #(SCORE_LED_START_Y_OVER),d1           
+    add.l   #(SCORE_LED_DIGIT_HEIGHT_OV),d1    ;y
+    swap    d1
+    add.l  #(SCORE_LED_START_X_OVER),d1         ;x  
+
+    
+    ;set chunk start position
+    move.l  #(SCORE_LED_START_Y_OVER),d2          ;y    
+    swap    d2
+    add.l  #(SCORE_LED_START_X_OVER),d2           ;x
+
+    ;set chunk width and height
+    move.l  #(SCORE_LED_DIGIT_WIDTH_OV),d3     
+    swap    d3
+    move.w  #(SCORE_LED_DIGIT_HEIGHT_OV),d3
+               
     
     rts
 
