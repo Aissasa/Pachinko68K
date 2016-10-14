@@ -127,13 +127,17 @@ BallDropping:
 
 	jsr		CheckWallCollision
 	cmp.l 	#(TRUE), d0
-	bne		.MoveOnToPegs 
+	bne		.BallNotColWithWall 
 
-	cmp.b 	#(TRUE), (BallJustCollided)
+	cmp.b 	#(TRUE), (BallJustWallCol)
     bne 	.JustWallCollided
 
-    ;jmp 	.ContinueBallUpdate
+    jmp 	.ContinueBallUpdate
 
+.BallNotColWithWall:
+
+	move.b 	#(FALSE), (BallJustWallCol)
+	jmp 	.MoveOnToPegs
 
 .MoveOnToPegs:
     ;check collisions with pegs
@@ -168,14 +172,14 @@ BallDropping:
 
 .EndPegLoop:
     ;check if it just collided
-    cmp.b 	#(TRUE), (BallJustCollided)
+    cmp.b 	#(TRUE), (BallJustPegCol)
     bne 	.JustPegCollided
 
     jmp 	.ContinueBallUpdate
 
 .NotColliding:
 
-	move.b 	#(FALSE), (BallJustCollided)
+	move.b 	#(FALSE), (BallJustPegCol)
 	jmp 	.ContinueBallUpdate
 
 .JustWallCollided:	
@@ -183,7 +187,7 @@ BallDropping:
 	;bounce
     jsr BounceBallOffWall
 
-	move.b 	#(TRUE), (BallJustCollided)
+	move.b 	#(TRUE), (BallJustWallCol)
 	jmp 	.DontMove
 	;jmp 	.ContinueBallUpdate
 	;jmp 	.MoveOnToPegs
@@ -194,7 +198,7 @@ BallDropping:
 	;bounce
     jsr BounceBallOffPeg
 
-	move.b 	#(TRUE), (BallJustCollided)
+	move.b 	#(TRUE), (BallJustPegCol)
 	jmp 	.DontMove
 	;jmp 	.ContinueBallUpdate
 
@@ -301,7 +305,8 @@ FrameBeginTime      dc.l    0
 BallCalls           dc.l    EndBallUpdate, DropBall, MoveBallToLeft, MoveBallToRight
 BallDropped         dc.b    (FALSE)
 BallMoved           dc.b    (FALSE)
-BallJustCollided	dc.b 	(FALSE)
+BallJustPegCol		dc.b 	(FALSE)
+BallJustWallCol		dc.b 	(FALSE)
 BallXPosition       dc.l    (BALL_INITIAL_X_POS)     
 BallXPositionFixed  dc.l    (BALL_INITIAL_X_POS<<FRACTION_BITS)
 BallYPosition       dc.l    (BALL_INITIAL_Y_POS)     
@@ -309,38 +314,22 @@ BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
 BallXVelocity       dc.l    (BALL_INIT_X_VELOCITY)
 BallYVelocity       dc.l    (BALL_INIT_Y_VELOCITY)
 
-PegsXs				;dc.l 	356, 407, 458, 509, 560, 612, 663, 714 			
-					dc.l 	384, 435, 486, 538, 589, 640, 691
-					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
-					dc.l 	384, 435, 486, 538, 589, 640, 691
-					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
-					dc.l 	384, 435, 486, 538, 589, 640, 691
-					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
-					dc.l 	384, 435, 486, 538, 589, 640, 691
-					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
-					dc.l 	384, 435, 486, 538, 589, 640, 691
-					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
-					dc.l 	384, 435, 486, 538, 589, 640, 691
-					dc.l 	356, 407, 458, 509, 560, 612, 663, 714     		; for the lower part of the board
+PegsXs				dc.l 	394, 545, 696 			
+					dc.l 	340, 473, 616, 742
+					dc.l 	394, 545, 696 			
+					dc.l 	340, 473, 616, 742
+					dc.l 	374, 490, 606, 708     		; for the lower part of the board
 
 
-PegsYs				;dc.l 	84, 84, 84, 84, 84, 84, 84, 84
-					dc.l 	129, 129, 129, 129, 129, 129, 129
-					dc.l 	174, 174, 174, 174, 174, 174, 174, 174
-					dc.l 	219, 219, 219, 219, 219, 219, 219
-					dc.l 	264, 264, 264, 264, 264, 264, 264, 264
-					dc.l 	309, 309, 309, 309, 309, 309, 309
-					dc.l 	354, 354, 354, 354, 354, 354, 354, 354
-					dc.l 	399, 399, 399, 399, 399, 399, 399
-					dc.l 	444, 444, 444, 444, 444, 444, 444, 444
-					dc.l 	489, 489, 489, 489, 489, 489, 489
-					dc.l 	534, 534, 534, 534, 534, 534, 534, 534
-					dc.l 	580, 580, 580, 580, 580, 580, 580
-					dc.l 	653, 653, 653, 653, 653, 653, 653, 653			; for the lower part of the board			
+PegsYs				dc.l 	167, 167, 167
+					dc.l 	297, 297, 297, 297
+					dc.l 	430, 430, 430
+					dc.l 	564, 564, 564, 564
+					dc.l 	696, 696, 696, 696			; for the lower part of the board			
 
 ClosestPegX			dc.l 	0
 ClosestPegY			dc.l 	0
-NumberOfPegs		dc.l 	(PegsYs-PegsXs)
+NumberOfPegs		dc.l 	(PegsYs-PegsXs)>>2
 LoopCounter			dc.l 	0
 
 Rand 				ds.l 	1

@@ -84,8 +84,9 @@ CheckPegCollision:
 	add.l	d0, d1	;d1 = dx^2 + dy^2
 	lsl.l 	#2, d1 	
 	lea 	(Sqrts), a6
-
-	move.l	(a6, d1), d0  	;d0 = sqrt(dx^2 + dy^2) with no byte swap
+	add.l 	d1, a6
+	move.l 	(a6), d0
+	;move.l	(a6, d1), d0  	;d0 = sqrt(dx^2 + dy^2) with no byte swap
 	
 	jsr 	SwapBytes 		;d0 bytes are swapped, so it has the correct sqrt
 
@@ -150,7 +151,9 @@ BounceBallOffPeg:
 	lsl.l 	#2, d7 	
 	lea 	(Sqrts), a6
 
-	move.l	(a6, d7), d2  			;d2 = TgMag = sqrt(tgX ^ 2 + tgY ^ 2) with no byte swap
+	add.l 	d7, a6
+	move.l 	(a6), d2
+	;move.l	(a6, d7), d2  			;d2 = TgMag = sqrt(tgX ^ 2 + tgY ^ 2) with no byte swap
 
 	move.l 	d0, d7					;store tgX
 	move.l 	d2, d0
