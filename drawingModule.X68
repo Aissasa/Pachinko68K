@@ -2,11 +2,20 @@
 
 DrawAllBackground:
     
-    ;a0 has the address to the bitmap
+    lea BackgroundBitmap, a0
+
     jsr SetFirstDrawParams
     jsr DrawPic
 
     rts
+
+DrawLoading:
+
+    lea LoadingBitmap, a0
+
+    jsr SetFirstDrawParams
+    jsr DrawPic
+
 
 DrawBackgroundChunk:
     
@@ -38,8 +47,6 @@ DrawBall:
 
 
 SetFirstDrawParams:
-
-    lea BackgroundBitmap, a0
 
     ;set draw start position to 0,0    
     move.l  #(OUTPUT_WINDOW_HEIGHT),d1  ;y

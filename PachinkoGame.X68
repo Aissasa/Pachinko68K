@@ -15,6 +15,7 @@ START  ORG    $1000
 Main:
     
     jsr SetOutputWindow
+    jsr DrawLoading
     jsr SetSomeVars 
     jsr EnableDoubleBuffer
     jsr DrawAllBackground
@@ -53,6 +54,10 @@ SetOutputWindow:
 
 
 UpdateBallPosition:
+
+	;see if we have to RestartGame
+	cmp.b 	#(TRUE), (HaveToRestart)
+	beq 	RestartGame
 
     ;initialize ball moved to false
     move.b  #(FALSE), (BallMoved)
@@ -189,8 +194,6 @@ BallDropping:
 
 	move.b 	#(TRUE), (BallJustWallCol)
 	jmp 	.DontMove
-	;jmp 	.ContinueBallUpdate
-	;jmp 	.MoveOnToPegs
 
 
 .JustPegCollided:	
@@ -200,13 +203,12 @@ BallDropping:
 
 	move.b 	#(TRUE), (BallJustPegCol)
 	jmp 	.DontMove
-	;jmp 	.ContinueBallUpdate
 
 .ContinueBallUpdate:
 .SkipBounceOffPeg:
 
     cmp.l   #(BOTTOM_RIGHT_BOARD_Y_POS-BALL_HEIGHT), (BallYPosition)
-    bge     .DontMove ;reached destination, do something **************************************************************
+    bge     .AddScore 
 
     ;update x pos
     move.l  (BallXPosition),d0
@@ -232,6 +234,74 @@ BallDropping:
 .DontMove:
 
     jmp     EndBallUpdate
+
+.AddScore:
+	
+	move.l 	#(EndScoresInGame-ScoresInGame), d0
+	lea 	ScoresBounds, a6
+
+	clr.l 	d3 		;counter
+	move.l (BallXPosition), d4
+	add.l 	#(BALL_WIDTH),d4
+
+.ScoreLoop:
+
+	move.l (a6)+, d1
+	move.l (a6)+, d2
+
+	cmp.l 	d4, d1
+	bgt 	.NextIteration
+
+	cmp.l 	d4, d2
+	bge 	.FoundScore
+
+
+.NextIteration:
+
+	add.l 	#1, d3
+	sub.l 	#1, d0
+	bne 	.ScoreLoop
+
+	jmp 	.ExitLoop 		
+
+.FoundScore:
+
+	clr.l 	d1
+	lea 	ScoresInGame, a6
+	add.l 	d3, a6
+	move.b 	(a6), d1
+	add.l 	d1, (Score)
+
+.ExitLoop:
+	
+	move.b 	#(TRUE), (HaveToRestart)
+    jmp     EndBallUpdate
+
+RestartGame:
+
+	add.b 	#1, (UsedBalls)
+	move.b 	#(FALSE), (HaveToRestart)
+	move.b 	#(TRUE), (BallMoved)
+	move.b 	#(FALSE), (BallDropped)
+
+	;reset pos
+	move.l 	#(BALL_INITIAL_X_POS), d0
+	lsl.l 	#(FRACTION_BITS), d0
+	move.l 	d0, (BallXPositionFixed)
+	
+	move.l 	#(BALL_INITIAL_Y_POS), d0
+	lsl.l 	#(FRACTION_BITS), d0
+	move.l 	d0, (BallYPositionFixed)
+
+
+	;reset velocity
+	move.l 	#0, BallXVelocity
+	move.l 	#0, BallYVelocity
+
+
+    jmp   	EndBallUpdate
+
+
 
 
 
@@ -291,6 +361,7 @@ RandomizeXVel:
 ;bitmaps
 BackgroundBitmap    INCBIN "bg.bmp"
 BallBitmap          INCBIN "ironBall.bmp"
+LoadingBitmap       INCBIN "loading.bmp"
 
 ;sqrts
 Sqrts 				INCBIN  "Sqrts.bin"	
@@ -325,7 +396,7 @@ PegsYs				dc.l 	167, 167, 167
 					dc.l 	297, 297, 297, 297
 					dc.l 	430, 430, 430
 					dc.l 	564, 564, 564, 564
-					dc.l 	696, 696, 696, 696			; for the lower part of the board			
+					dc.l 	698, 698, 698, 698			; for the lower part of the board			
 
 ClosestPegX			dc.l 	0
 ClosestPegY			dc.l 	0
@@ -334,9 +405,20 @@ LoopCounter			dc.l 	0
 
 Rand 				ds.l 	1
 
+HaveToRestart 		dc.l 	(FALSE)
+
+UsedBalls 			dc.l 	0
+
+Score 				dc.l 	0
+ScoresBounds 		dc.l 	385, 480, 500, 596, 618, 698
+ScoresInGame 		dc.b 	2, 5, 3 	 		
+EndScoresInGame
+    
     END    START
 
         
+
+
 
 
 
