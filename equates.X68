@@ -63,6 +63,7 @@ Y_VELOCITY_SOFTNER 			EQU ONE_EIGHTH
 GET_TIME_COMMAND			EQU 8		;get current time trap code
 INPUT_COMMAND               EQU 19      ;get input keys    
 SET_OUTPUT_WINDOW_COMMAND   EQU 33      ;set output trap code
+PLAY_SOUND_COMMAND			EQU 73
 SET_PEN_COLOR_COMMAND       EQU 80      ;set pen color trap code
 DRAW_A_PIXEL_COMMAND        EQU 82      ;draw pixel trap code
 SET_DRAWING_MODE_COMMAND    EQU 92      ;set drawing mode used for enabeling double buffering

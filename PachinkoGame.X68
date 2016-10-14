@@ -192,6 +192,10 @@ BallDropping:
 	;bounce
     jsr BounceBallOffWall
 
+    lea 	WallCollisionSound, a1
+	jsr 	PlaySound
+
+
 	move.b 	#(TRUE), (BallJustWallCol)
 	jmp 	.DontMove
 
@@ -200,6 +204,10 @@ BallDropping:
 
 	;bounce
     jsr BounceBallOffPeg
+
+    ;set sound to play to a1
+	lea 	CollisionSound, a1
+	jsr 	PlaySound
 
 	move.b 	#(TRUE), (BallJustPegCol)
 	jmp 	.DontMove
@@ -274,6 +282,10 @@ BallDropping:
 
 .ExitLoop:
 	
+	;set sound to play to a1
+	lea 	ScoreSound, a1
+	jsr 	PlaySound
+	
 	move.b 	#(TRUE), (HaveToRestart)
     jmp     EndBallUpdate
 
@@ -288,7 +300,7 @@ RestartGame:
 	move.l 	#(BALL_INITIAL_X_POS), d0
 	lsl.l 	#(FRACTION_BITS), d0
 	move.l 	d0, (BallXPositionFixed)
-	
+
 	move.l 	#(BALL_INITIAL_Y_POS), d0
 	lsl.l 	#(FRACTION_BITS), d0
 	move.l 	d0, (BallYPositionFixed)
@@ -302,7 +314,12 @@ RestartGame:
     jmp   	EndBallUpdate
 
 
+PlaySound:
 
+	move.l 	#(PLAY_SOUND_COMMAND), d0
+	Trap 	#15
+
+	rts
 
 
 SetFrameBeginTime:
@@ -349,7 +366,6 @@ RandomizeXVel:
 	rts
 
 
-
     include "InputHandler.x68"
     include "drawingModule.X68"
     include	"CollisionModule.x68"
@@ -362,6 +378,11 @@ RandomizeXVel:
 BackgroundBitmap    INCBIN "bg.bmp"
 BallBitmap          INCBIN "ironBall.bmp"
 LoadingBitmap       INCBIN "loading.bmp"
+
+;Sounds 
+CollisionSound 		dc.b	'Collision.wav', 0
+WallCollisionSound 	dc.b	'WallCollision.wav', 0
+ScoreSound 			dc.b	'Score.wav', 0
 
 ;sqrts
 Sqrts 				INCBIN  "Sqrts.bin"	
