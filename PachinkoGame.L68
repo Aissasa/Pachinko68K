@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 10/13/2016 3:47:17 AM
+Created On: 10/13/2016 11:12:51 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Pachinko Game
@@ -25,1009 +25,1208 @@ Created On: 10/13/2016 3:47:17 AM
 00001000                            21  
 00001000                            22  ;math
 00001000  =00000008                 23  FRACTION_BITS               EQU 8
-00001000  =0000001A                 24  ONE_TENTH                   EQU 26
-00001000  =00000033                 25  TWO_TENTH                   EQU 51
-00001000  =000000CD                 26  EIGHT_TENTH                 EQU 205
-00001000  =00000080                 27  HALF                        EQU 128
-00001000                            28  
-00001000                            29  ;output window
-00001000  =0000042F                 30  OUTPUT_WINDOW_WIDTH         EQU 1071        ;the output screen width in pixels
-00001000  =00000320                 31  OUTPUT_WINDOW_HEIGHT        EQU 800         ;the output screen height in pixels
-00001000                            32  
-00001000                            33  ;pachinko board dimesions and key points
-00001000  =00000139                 34  TOP_LEFT_BOARD_X_POS        EQU 313
-00001000  =0000002A                 35  TOP_LEFT_BOARD_Y_POS        EQU 42
-00001000  =000002F5                 36  BOTTOM_RIGHT_BOARD_X_POS    EQU 757
-00001000  =0000029A                 37  BOTTOM_RIGHT_BOARD_Y_POS    EQU 666
-00001000  =000001BC                 38  BOARD_WIDTH                 EQU (BOTTOM_RIGHT_BOARD_X_POS-TOP_LEFT_BOARD_X_POS)
-00001000  =00000270                 39  BOARD_HEIGHT                EQU (BOTTOM_RIGHT_BOARD_Y_POS-TOP_LEFT_BOARD_Y_POS)
-00001000                            40  
-00001000                            41  ;ball
-00001000  =0000001E                 42  BALL_WIDTH                  EQU 30
-00001000  =0000001E                 43  BALL_HEIGHT                 EQU 30
-00001000  =0000000F                 44  BALL_RADIUS                 EQU 15
-00001000  =00000139                 45  BALL_INITIAL_X_POS          EQU TOP_LEFT_BOARD_X_POS
-00001000  =0000002A                 46  BALL_INITIAL_Y_POS          EQU TOP_LEFT_BOARD_Y_POS
-00001000                            47  
-00001000                            48  
-00001000  =00000250                 49  BALL_SLIDE_VELOCITY         EQU $250
+00001000  =0000000D                 24  ONE_TWENTIETH               EQU 13
+00001000  =00000011                 25  ONE_FIFTEENTH               EQU 17
+00001000  =0000001A                 26  ONE_TENTH                   EQU 26
+00001000  =00000040                 27  ONE_FOURTH                  EQU 64
+00001000  =00000055                 28  ONE_THIRD                   EQU 85
+00001000  =00000080                 29  HALF                        EQU 128
+00001000  =000000CD                 30  EIGHT_TENTH                 EQU 205
+00001000                            31  
+00001000                            32  ;output window
+00001000  =0000042F                 33  OUTPUT_WINDOW_WIDTH         EQU 1071        ;the output screen width in pixels
+00001000  =00000320                 34  OUTPUT_WINDOW_HEIGHT        EQU 800         ;the output screen height in pixels
+00001000                            35  
+00001000                            36  ;pachinko board dimesions and key points
+00001000  =00000139                 37  TOP_LEFT_BOARD_X_POS        EQU 313
+00001000  =0000002A                 38  TOP_LEFT_BOARD_Y_POS        EQU 42
+00001000  =000002F5                 39  BOTTOM_RIGHT_BOARD_X_POS    EQU 757
+00001000  =0000029A                 40  BOTTOM_RIGHT_BOARD_Y_POS    EQU 666
+00001000  =000001BC                 41  BOARD_WIDTH                 EQU (BOTTOM_RIGHT_BOARD_X_POS-TOP_LEFT_BOARD_X_POS)
+00001000  =00000270                 42  BOARD_HEIGHT                EQU (BOTTOM_RIGHT_BOARD_Y_POS-TOP_LEFT_BOARD_Y_POS)
+00001000                            43  
+00001000                            44  ;ball
+00001000  =00000014                 45  BALL_WIDTH                  EQU 20
+00001000  =00000014                 46  BALL_HEIGHT                 EQU 20
+00001000  =0000000A                 47  BALL_RADIUS                 EQU 10
+00001000  =00000139                 48  BALL_INITIAL_X_POS          EQU TOP_LEFT_BOARD_X_POS
+00001000  =0000002A                 49  BALL_INITIAL_Y_POS          EQU TOP_LEFT_BOARD_Y_POS
 00001000                            50  
-00001000  =00000015                 51  BALL_Y_ACCELERATION         EQU $15
-00001000                            52  
-00001000  =00000000                 53  BALL_INIT_X_VELOCITY        EQU 0      ;****************************** make random between -2,2***************************************************************
-00001000  =00000000                 54  BALL_INIT_Y_VELOCITY        EQU 0
+00001000                            51  
+00001000  =00000250                 52  BALL_SLIDE_VELOCITY         EQU $250
+00001000                            53  
+00001000  =00000015                 54  BALL_Y_ACCELERATION         EQU $15
 00001000                            55  
-00001000                            56  
-00001000                            57  ;pegs
-00001000  =0000000E                 58  PEG_WIDTH                   EQU 14
-00001000  =0000000E                 59  PEG_HEIGHT                  EQU 14
-00001000  =00000007                 60  PEG_RADIUS                  EQU 7
-00001000                            61  
-00001000                            62  
-00001000                            63  ;collision
-00001000  =00000018                 64  MIN_DX_TO_CHECK_COLLISION   EQU 2+(BALL_RADIUS+PEG_RADIUS)
-00001000  =00000018                 65  MIN_DY_TO_CHECK_COLLISION   EQU 2+(BALL_RADIUS+PEG_RADIUS)
-00001000                            66  
-00001000                            67  
-00001000                            68  ;commands
-00001000  =00000008                 69  GET_TIME_COMMAND            EQU 8       ;get current time trap code
-00001000  =00000013                 70  INPUT_COMMAND               EQU 19      ;get input keys    
-00001000  =00000021                 71  SET_OUTPUT_WINDOW_COMMAND   EQU 33      ;set output trap code
-00001000  =00000050                 72  SET_PEN_COLOR_COMMAND       EQU 80      ;set pen color trap code
-00001000  =00000052                 73  DRAW_A_PIXEL_COMMAND        EQU 82      ;draw pixel trap code
-00001000  =0000005C                 74  SET_DRAWING_MODE_COMMAND    EQU 92      ;set drawing mode used for enabeling double buffering
-00001000  =0000005E                 75  REPAINT_SCREEN_COMMAND      EQU 94      ;repaints screen command from a buffer
-00001000                            76  
-00001000  =00000011                 77  DOUBLE_BUFFERING_MODE       EQU 17      ;double buffering mode option
-00001000                            78  
-00001000                            79  ;offsets in the bitmap
-00001000  =0000000A                 80  OFFSET_TO_PIXEL_ARRAY       EQU $0A      ;the offset to the address containing the pixel array starting byte
-00001000  =00000012                 81  OFFSET_IMAGE_WIDTH          EQU $12      ;the offset to the address containing the image width
-00001000  =00000016                 82  OFFSET_IMAGE_HEIGHT         EQU $16      ;the offset to the address containing the image height
+00001000  =00000000                 56  BALL_INIT_X_VELOCITY        EQU 0      ;****************************** make random between -2,2***************************************************************
+00001000  =00000000                 57  BALL_INIT_Y_VELOCITY        EQU 0
+00001000                            58  
+00001000                            59  
+00001000                            60  ;pegs
+00001000  =0000000A                 61  PEG_WIDTH                   EQU 10
+00001000  =0000000A                 62  PEG_HEIGHT                  EQU 10
+00001000  =00000005                 63  PEG_RADIUS                  EQU 5
+00001000                            64  
+00001000                            65  
+00001000                            66  ;collision
+00001000  =00000011                 67  MIN_DX_TO_CHECK_COLLISION   EQU 2+(BALL_RADIUS+PEG_RADIUS)
+00001000  =00000011                 68  MIN_DY_TO_CHECK_COLLISION   EQU 2+(BALL_RADIUS+PEG_RADIUS)
+00001000  =00000040                 69  X_VELOCITY_SOFTNER          EQU ONE_FOURTH
+00001000  =00000011                 70  Y_VELOCITY_SOFTNER          EQU ONE_FIFTEENTH
+00001000                            71  
+00001000                            72  
+00001000                            73  ;commands
+00001000  =00000008                 74  GET_TIME_COMMAND            EQU 8       ;get current time trap code
+00001000  =00000013                 75  INPUT_COMMAND               EQU 19      ;get input keys    
+00001000  =00000021                 76  SET_OUTPUT_WINDOW_COMMAND   EQU 33      ;set output trap code
+00001000  =00000050                 77  SET_PEN_COLOR_COMMAND       EQU 80      ;set pen color trap code
+00001000  =00000052                 78  DRAW_A_PIXEL_COMMAND        EQU 82      ;draw pixel trap code
+00001000  =0000005C                 79  SET_DRAWING_MODE_COMMAND    EQU 92      ;set drawing mode used for enabeling double buffering
+00001000  =0000005E                 80  REPAINT_SCREEN_COMMAND      EQU 94      ;repaints screen command from a buffer
+00001000                            81  
+00001000  =00000011                 82  DOUBLE_BUFFERING_MODE       EQU 17      ;double buffering mode option
 00001000                            83  
-00001000                            84  
-00001000                            85  ;Stack pointers for drawing chunks
-00001000  =00000024                 86  FIRST_PIXEL_ADDRESS_STACK_OFFSET    EQU 36
-00001000  =00000020                 87  IMAGE_WIDTH_STACK_OFFSET            EQU 32
-00001000  =0000001C                 88  IMAGE_HEIGHT_STACK_OFFSET           EQU 28
-00001000  =00000018                 89  DRAW_X_POS_STACK_OFFSET             EQU 24
-00001000  =00000014                 90  DRAW_Y_POS_STACK_OFFSET             EQU 20
-00001000  =00000010                 91  CHUNK_X_POS_STACK_OFFSET            EQU 16
-00001000  =0000000C                 92  CHUNK_Y_POS_STACK_OFFSET            EQU 12
-00001000  =00000008                 93  CHUNK_WIDTH_STACK_OFFSET            EQU 8
-00001000  =00000004                 94  CHUNK_HEIGHT_STACK_OFFSET           EQU 4
-00001000  =00000028                 95  STACK_OFFSET_WHEN_DRAWING           EQU FIRST_PIXEL_ADDRESS_STACK_OFFSET+CHUNK_HEIGHT_STACK_OFFSET
-00001000                            96  
-00001000                            97  ;stack pointers for checking peg collision
-00001000  =00000008                 98  CURRENT_PEG_X_STACK_OFFSET          EQU 8
-00001000  =00000004                 99  CURRENT_PEG_Y_STACK_OFFSET          EQU 4
-00001000  =00000008                100  STACK_OFFSET_IN_PEG_COL             EQU CURRENT_PEG_X_STACK_OFFSET
+00001000                            84  ;offsets in the bitmap
+00001000  =0000000A                 85  OFFSET_TO_PIXEL_ARRAY       EQU $0A      ;the offset to the address containing the pixel array starting byte
+00001000  =00000012                 86  OFFSET_IMAGE_WIDTH          EQU $12      ;the offset to the address containing the image width
+00001000  =00000016                 87  OFFSET_IMAGE_HEIGHT         EQU $16      ;the offset to the address containing the image height
+00001000                            88  
+00001000                            89  
+00001000                            90  ;Stack pointers for drawing chunks
+00001000  =00000024                 91  FIRST_PIXEL_ADDRESS_STACK_OFFSET    EQU 36
+00001000  =00000020                 92  IMAGE_WIDTH_STACK_OFFSET            EQU 32
+00001000  =0000001C                 93  IMAGE_HEIGHT_STACK_OFFSET           EQU 28
+00001000  =00000018                 94  DRAW_X_POS_STACK_OFFSET             EQU 24
+00001000  =00000014                 95  DRAW_Y_POS_STACK_OFFSET             EQU 20
+00001000  =00000010                 96  CHUNK_X_POS_STACK_OFFSET            EQU 16
+00001000  =0000000C                 97  CHUNK_Y_POS_STACK_OFFSET            EQU 12
+00001000  =00000008                 98  CHUNK_WIDTH_STACK_OFFSET            EQU 8
+00001000  =00000004                 99  CHUNK_HEIGHT_STACK_OFFSET           EQU 4
+00001000  =00000028                100  STACK_OFFSET_WHEN_DRAWING           EQU FIRST_PIXEL_ADDRESS_STACK_OFFSET+CHUNK_HEIGHT_STACK_OFFSET
 00001000                           101  
-00001000                           102  
-00001000                           103  
-00001000                           104  ;input keycodes
-00001000  =00000020                105  SPACE_KEY   EQU $20
-00001000  =00000025                106  LEFT_ARROW  EQU $25
-00001000  =00000027                107  RIGHT_ARROW EQU $27
+00001000                           102  ;stack pointers for checking peg collision
+00001000  =00000008                103  CURRENT_PEG_X_STACK_OFFSET          EQU 8
+00001000  =00000004                104  CURRENT_PEG_Y_STACK_OFFSET          EQU 4
+00001000  =00000008                105  STACK_OFFSET_IN_PEG_COL             EQU CURRENT_PEG_X_STACK_OFFSET
+00001000                           106  
+00001000                           107  
 00001000                           108  
-00001000                           109  ;input location of keycode in d1
-00001000  =00000010                110  SPACE_KEY_LOCATION   EQU 16
-00001000  =00000008                111  LEFT_ARROW_LOCATION  EQU 8
-00001000  =00000000                112  RIGHT_ARROW_LOCATION EQU 0
+00001000                           109  ;input keycodes
+00001000  =00000020                110  SPACE_KEY   EQU $20
+00001000  =00000025                111  LEFT_ARROW  EQU $25
+00001000  =00000027                112  RIGHT_ARROW EQU $27
 00001000                           113  
-00001000                           114  ;frame rate
-00001000  =00000001                115  TIME_PER_FRAME       EQU 1
-00001000                           116  
-00001000                           117  
+00001000                           114  ;input location of keycode in d1
+00001000  =00000010                115  SPACE_KEY_LOCATION      EQU 16
+00001000  =00000008                116  LEFT_ARROW_LOCATION     EQU 8
+00001000  =00000000                117  RIGHT_ARROW_LOCATION    EQU 0
 00001000                           118  
-00001000                           119  
-00001000                           120  
+00001000                           119  ;frame rate
+00001000  =00000001                120  TIME_PER_FRAME          EQU 1
 00001000                           121  
-00001000                           122  
-00001000                           123  
-00001000                           124  -------------------- end include --------------------
-00001000                           125  
-00001000                           126  Main:
-00001000                           127      
-00001000  4EB9 00001050            128      jsr SetOutputWindow 
-00001006  4EB9 0000145A            129      jsr EnableDoubleBuffer
-0000100C  4EB9 00001298            130      jsr DrawAllBackground
-00001012  4EB9 000012C0            131      jsr DrawBallFirstTime
-00001018  4EB9 00001462            132      jsr PaintScreenBuffer
-0000101E                           133      
-0000101E                           134  GameLoop:
-0000101E                           135      
-0000101E  4EB9 00001204            136      jsr SetFrameBeginTime
-00001024                           137  
-00001024  4EB9 00001226            138      jsr HandleInput
-0000102A                           139      
-0000102A  4EB9 00001062            140      jsr UpdateBallPosition
-00001030                           141  
-00001030  4EB9 000012A6            142      jsr DrawBackgroundChunk
-00001036  4EB9 000012CE            143      jsr DrawBall
-0000103C                           144  
-0000103C  4EB9 00001210            145      jsr WaitToEndFrame
-00001042                           146      
-00001042  4EB9 00001462            147      jsr PaintScreenBuffer
-00001048                           148  
-00001048  4EF8 101E                149      jmp GameLoop          
-0000104C                           150      
-0000104C  4E72 3000                151      STOP    #$3000                     
-00001050                           152  
-00001050                           153  SetOutputWindow:
-00001050                           154  
-00001050                           155      ;set the output window dimensions
-00001050  7021                     156      move.l  #SET_OUTPUT_WINDOW_COMMAND, d0
-00001052  223C 0000042F            157      move.l  #OUTPUT_WINDOW_WIDTH, d1
-00001058  4841                     158      swap.w  d1
-0000105A  323C 0320                159      move.w  #OUTPUT_WINDOW_HEIGHT, d1
-0000105E  4E4F                     160      Trap    #15
-00001060                           161  
-00001060  4E75                     162      rts
-00001062                           163  
-00001062                           164  
-00001062                           165  UpdateBallPosition:
-00001062                           166  
-00001062                           167      ;initialize ball moved to false
-00001062  13FC 0000 002A70CD       168      move.b  #(FALSE), (BallMoved)
-0000106A                           169  
-0000106A                           170      ;see if the ball is already dropped
-0000106A  0C39 0001 002A70CC       171      cmp.b   #(TRUE), (BallDropped)
-00001072  6700 008C                172      beq     BallDropping
-00001076                           173      
-00001076                           174      ;depending on user input, call drop or Move
-00001076  2039 002A70B4            175      move.l  (PlayerInput), d0
-0000107C  E588                     176      lsl.l   #2,d0
-0000107E  43F9 002A70BC            177      lea BallCalls, a1
-00001084  2231 0000                178      move.l  (a1, d0),d1
-00001088                           179      
-00001088                           180      ;avoid null calls
-00001088  0C81 00000000            181      cmpi.l  #0, d1
-0000108E  6700 0006                182      beq     EndBallUpdate
-00001092                           183      
-00001092  2441                     184      move.l  d1,a2
-00001094  4ED2                     185      jmp     (a2)
-00001096                           186  
-00001096                           187  EndBallUpdate:
-00001096                           188      
-00001096  4E75                     189      rts
-00001098                           190  
-00001098                           191  DropBall:
-00001098                           192  
-00001098  13FC 0001 002A70CC       193      move.b  #(TRUE), (BallDropped)
-000010A0                           194  
-000010A0  4EF8 1096                195      jmp     EndBallUpdate
-000010A4                           196  
-000010A4                           197  MoveBallToLeft:
-000010A4                           198  
-000010A4                           199      ;check if in bounds
-000010A4  0CB9 00000139 002A70D0   200      cmp.l   #(TOP_LEFT_BOARD_X_POS), (BallXPosition)
-000010AE  6F00 001E                201      ble     .DontMove
-000010B2                           202  
-000010B2  2039 002A70D0            203      move.l  (BallXPosition),d0
-000010B8  E188                     204      lsl.l   #8,d0
-000010BA                           205  
-000010BA  0480 00000250            206      sub.l   #(BALL_SLIDE_VELOCITY), d0
-000010C0  23C0 002A70D4            207      move.l  d0, (BallXPositionFixed)
-000010C6                           208  
-000010C6                           209      ;ball moved
-000010C6  13FC 0001 002A70CD       210      move.b  #(TRUE), (BallMoved)
-000010CE                           211  
-000010CE                           212  .DontMove:
-000010CE                           213  
-000010CE  4EF8 1096                214      jmp     EndBallUpdate
-000010D2                           215  
-000010D2                           216  MoveBallToRight:
-000010D2                           217  
-000010D2                           218      ;check if in bounds
-000010D2  0CB9 000002D7 002A70D0   219      cmp.l   #(BOTTOM_RIGHT_BOARD_X_POS-BALL_WIDTH), (BallXPosition)
-000010DC  6C00 001E                220      bge     .DontMove
-000010E0                           221  
-000010E0  2039 002A70D0            222      move.l  (BallXPosition),d0
-000010E6  E188                     223      lsl.l   #8,d0
-000010E8                           224      
-000010E8  0680 00000250            225      add.l   #(BALL_SLIDE_VELOCITY), d0
-000010EE  23C0 002A70D4            226      move.l  d0, (BallXPositionFixed)
-000010F4                           227  
-000010F4                           228      ;ball moved
-000010F4  13FC 0001 002A70CD       229      move.b  #(TRUE), (BallMoved)
-000010FC                           230  
-000010FC                           231  .DontMove:
-000010FC                           232  
-000010FC  4EF8 1096                233      jmp     EndBallUpdate
-00001100                           234  
-00001100                           235  
-00001100                           236  BallDropping:
-00001100                           237  
-00001100  4EB9 000014A8            238      jsr     CheckWallCollision
-00001106  B0BC 00000001            239      cmp.l   #(TRUE), d0
-0000110C  6600 0014                240      bne     .MoveOnToPegs 
-00001110                           241  
-00001110  0C39 0001 002A70CE       242      cmp.b   #(TRUE), (BallJustCollided)
-00001118  6600 0076                243      bne     .JustWallCollided
-0000111C                           244  
-0000111C  4EF9 000011B8            245      jmp     .ContinueBallUpdate
-00001122                           246  
-00001122                           247  
-00001122                           248  .MoveOnToPegs:
-00001122                           249      ;check collisions with pegs here *************************************
-00001122                           250  
-00001122  43F9 002A70E8            251      lea     PegsXs, a1
-00001128  45F9 002A70F4            252      lea     PegsYs, a2
-0000112E  2E39 002A7108            253      move.l  (NumberOfPegs), d7
-00001134                           254  
-00001134                           255  .NextPeg:
-00001134                           256      
-00001134                           257      ;get current peg
-00001134  2039 002A710C            258      move.l (LoopCounter), d0
-0000113A  E588                     259      lsl.l   #2, d0
-0000113C  2F31 0000                260      move.l  (a1, d0), -(sp) ;push y to the stack
-00001140  2F32 0000                261      move.l  (a2, d0), -(sp) ;push x to the stack
-00001144                           262  
-00001144  4EB9 000014D0            263      jsr     CheckPegCollision
-0000114A                           264      ;free stack
-0000114A  508F                     265      add.l   #(STACK_OFFSET_IN_PEG_COL), sp
-0000114C                           266  
-0000114C  B0BC 00000001            267      cmp.l   #(TRUE), d0     ;if colliding, end the loop
-00001152  6700 001C                268      beq     .EndPegLoop
-00001156                           269  
-00001156  52B9 002A710C            270      add.l   #1, (LoopCounter) 
-0000115C  5387                     271      sub.l   #1, d7          ;else, if there are other oegs, check them, else no collision in this frame
-0000115E  66D4                     272      bne     .NextPeg
-00001160                           273  
-00001160                           274      ;reinit loop counter
-00001160  23FC 00000000 002A710C   275      move.l  #0, (LoopCounter)
-0000116A                           276  
-0000116A  4EF9 00001182            277      jmp     .NotColliding
-00001170                           278  
-00001170                           279  .EndPegLoop:
-00001170                           280      ;check if it just collided
-00001170  0C39 0001 002A70CE       281      cmp.b   #(TRUE), (BallJustCollided)
-00001178  6600 002A                282      bne     .JustPegCollided
-0000117C                           283  
-0000117C  4EF9 000011B8            284      jmp     .ContinueBallUpdate
-00001182                           285  
-00001182                           286  .NotColliding:
-00001182                           287  
-00001182  13FC 0000 002A70CE       288      move.b  #(FALSE), (BallJustCollided)
-0000118A  4EF9 000011B8            289      jmp     .ContinueBallUpdate
-00001190                           290  
-00001190                           291  .JustWallCollided:  
-00001190                           292  
-00001190                           293      ;bounce
-00001190  4EB9 0000156E            294      jsr BounceBallOffWall
-00001196                           295  
-00001196  13FC 0001 002A70CE       296      move.b  #(TRUE), (BallJustCollided)
-0000119E  4EF9 00001200            297      jmp     .DontMove
-000011A4                           298  
-000011A4                           299  .JustPegCollided:   
-000011A4                           300  
-000011A4                           301      ;bounce
-000011A4  4EB9 00001584            302      jsr BounceBallOffPeg
-000011AA                           303  
-000011AA  13FC 0001 002A70CE       304      move.b  #(TRUE), (BallJustCollided)
-000011B2  4EF9 00001200            305      jmp     .DontMove
-000011B8                           306  
-000011B8                           307  .ContinueBallUpdate:
-000011B8                           308  .SkipBounceOffPeg:
-000011B8                           309  
-000011B8  0CB9 0000027C 002A70D8   310      cmp.l   #(BOTTOM_RIGHT_BOARD_Y_POS-BALL_HEIGHT), (BallYPosition)
-000011C2  6C00 003C                311      bge     .DontMove ;reached destination, do something ***********************************
-000011C6                           312  
-000011C6                           313      ;update x pos
-000011C6  2039 002A70D0            314      move.l  (BallXPosition),d0
-000011CC  E188                     315      lsl.l   #8,d0
-000011CE                           316      
-000011CE  D0B9 002A70E0            317      add.l   (BallXVelocity), d0
-000011D4  23C0 002A70D4            318      move.l  d0, (BallXPositionFixed)
-000011DA                           319  
-000011DA                           320  
-000011DA                           321      ;update Y vel
-000011DA  06B9 00000015 002A70E4   322      add.l   #(BALL_Y_ACCELERATION), (BallYVelocity)
-000011E4                           323  
-000011E4                           324      ;add the velocity to the y pos
-000011E4  2039 002A70D8            325      move.l  (BallYPosition),d0
-000011EA  E188                     326      lsl.l   #8,d0
-000011EC                           327      
-000011EC  D0B9 002A70E4            328      add.l   (BallYVelocity), d0
-000011F2  23C0 002A70DC            329      move.l  d0, (BallYPositionFixed)
-000011F8                           330  
-000011F8  13FC 0001 002A70CD       331      move.b  #(TRUE), BallMoved
-00001200                           332  
-00001200                           333  
-00001200                           334  .DontMove:
-00001200                           335  
-00001200  4EF8 1096                336      jmp     EndBallUpdate
-00001204                           337  
-00001204                           338  
-00001204                           339  
-00001204                           340  SetFrameBeginTime:
-00001204                           341  
-00001204                           342      ;get current time
-00001204  7008                     343      move.l  #(GET_TIME_COMMAND), d0
-00001206  4E4F                     344      Trap    #15
-00001208                           345      ;set FrameBeginTime
-00001208  23C1 002A70B8            346      move.l  d1, (FrameBeginTime)
-0000120E                           347  
-0000120E  4E75                     348      rts
-00001210                           349  
-00001210                           350  
-00001210                           351  WaitToEndFrame:
-00001210                           352  
-00001210  2439 002A70B8            353      move.l  (FrameBeginTime),d2
-00001216                           354  
-00001216                           355  .LoopAgain:
-00001216                           356      ;get current time
-00001216  7008                     357      move.l  #(GET_TIME_COMMAND), d0
-00001218  4E4F                     358      Trap    #15
-0000121A                           359      
-0000121A                           360      ;get DeltaTime in d1
-0000121A  9282                     361      sub.l   d2,d1
-0000121C                           362  
-0000121C  B2BC 00000001            363      cmp.l   #(TIME_PER_FRAME), d1
-00001222  6DF2                     364      blt     .LoopAgain
-00001224                           365  
-00001224  4E75                     366      rts
-00001226                           367  
-00001226                           368  
-00001226                           369  
-00001226                           370  
-00001226                           371      include "InputHandler.x68"
-00001226                           372  
-00001226                           373  
-00001226                           374  HandleInput:  
-00001226                           375  
-00001226                           376      ;reset PlayerInput
-00001226  23FC 00000000 002A70B4   377      move.l  #0,(PlayerInput)
-00001230                           378      ;Set the inputs    
-00001230  7013                     379      move.l  #(INPUT_COMMAND),d0
-00001232                           380      ;d1: $00202527 => space, left arrow, right arrow
-00001232                           381      ;move.l  $20<<$16+$25<<$8+$27,d1
-00001232  7220                     382      move.l  #(SPACE_KEY),d1
-00001234  E189                     383      lsl.l   #8,d1
-00001236  123C 0025                384      move.b  #(LEFT_ARROW),d1
-0000123A  E189                     385      lsl.l   #8,d1
-0000123C  123C 0027                386      move.b  #(RIGHT_ARROW),d1
-00001240                           387  
-00001240  4E4F                     388      Trap    #15
-00001242                           389  
-00001242                           390      ;check if ball is droped, if yes skip
-00001242  0C39 0001 002A70CC       391      cmpi.b  #(TRUE),(BallDropped)
-0000124A  6700 001A                392      beq     EndHandleInput
-0000124E                           393  
-0000124E                           394      ;check the pressed key and call subroutines accordingly
-0000124E  0801 0010                395      btst.l  #(SPACE_KEY_LOCATION), d1       
-00001252  6600 0014                396      bne     DropBallInput
-00001256                           397  
-00001256  0801 0008                398      btst.l  #(LEFT_ARROW_LOCATION), d1       
-0000125A  6600 001A                399      bne     MoveBallToLeftInput
-0000125E                           400  
-0000125E  0801 0000                401      btst.l  #(RIGHT_ARROW_LOCATION), d1       
-00001262  6600 0026                402      bne     MoveBallToRightInput
-00001266                           403  
-00001266                           404  EndHandleInput:
-00001266                           405  
-00001266  4E75                     406      rts
-00001268                           407  
-00001268                           408  DropBallInput:
-00001268                           409  
-00001268  23FC 00000001 002A70B4   410      move.l #1,(PlayerInput)
-00001272                           411  
-00001272  4EF8 1266                412      jmp EndHandleInput
-00001276                           413  
-00001276                           414  MoveBallToLeftInput:
-00001276                           415      
-00001276                           416      ;if both arrows are pressed, do nothing
-00001276  0801 0000                417      btst.l  #(RIGHT_ARROW_LOCATION), d1       
-0000127A  66EA                     418      bne     EndHandleInput
-0000127C                           419  
-0000127C  23FC 00000002 002A70B4   420      move.l #2,(PlayerInput)
-00001286                           421  
-00001286  4EF8 1266                422      jmp     EndHandleInput
-0000128A                           423  
-0000128A                           424  MoveBallToRightInput:
-0000128A                           425      
-0000128A  23FC 00000003 002A70B4   426      move.l #3,(PlayerInput)  
-00001294                           427  
-00001294  4EF8 1266                428      jmp     EndHandleInput
-00001298                           429    
-00001298                           430  -------------------- end include --------------------
-00001298                           431      include "drawingModule.X68"
-00001298                           432  ; this module contains drawing related subroutines
-00001298                           433  
-00001298                           434  DrawAllBackground:
-00001298                           435      
-00001298                           436      ;a0 has the address to the bitmap
-00001298  4EB9 000012E8            437      jsr SetFirstDrawParams
-0000129E  4EB9 00001378            438      jsr DrawPic
-000012A4                           439  
-000012A4  4E75                     440      rts
-000012A6                           441  
-000012A6                           442  DrawBackgroundChunk:
-000012A6                           443      
-000012A6  0C39 0000 002A70CD       444      cmp.b #(FALSE),(BallMoved)
-000012AE  6700 000E                445      beq .DontDraw
-000012B2                           446      
-000012B2  4EB9 00001310            447      jsr SetBgDrawParams
-000012B8  4EB9 00001378            448      jsr DrawPic
-000012BE                           449  
-000012BE                           450  .DontDraw:
-000012BE  4E75                     451      rts
-000012C0                           452  
-000012C0                           453  DrawBallFirstTime:
-000012C0                           454  
-000012C0  13FC 0001 002A70CD       455      move.b  #(TRUE), (BallMoved)
-000012C8                           456  
-000012C8  4EF9 000012CE            457      jmp     DrawBall
-000012CE                           458  
-000012CE                           459  DrawBall:
-000012CE                           460  
-000012CE  0C39 0000 002A70CD       461      cmp.b #(FALSE),(BallMoved)
-000012D6  6700 000E                462      beq .DontDraw
-000012DA                           463  
-000012DA  4EB9 00001342            464      jsr SetBallDrawParams
-000012E0  4EB9 00001378            465      jsr DrawPic
-000012E6                           466  
-000012E6                           467  .DontDraw:
-000012E6  4E75                     468      rts
-000012E8                           469  
-000012E8                           470  
-000012E8                           471  SetFirstDrawParams:
-000012E8                           472  
-000012E8  41F9 0000163E            473      lea BackgroundBitmap, a0
-000012EE                           474  
-000012EE                           475      ;set draw start position to 0,0    
-000012EE  223C 00000320            476      move.l  #(OUTPUT_WINDOW_HEIGHT),d1  ;y
-000012F4  4841                     477      swap    d1
-000012F6  323C 0000                478      move.w  #0,d1                       ;x
-000012FA                           479      
-000012FA                           480      ;set chunk start position to 0,0    
-000012FA  7400                     481      move.l  #0,d2                       ;y
-000012FC  4842                     482      swap    d2
-000012FE  343C 0000                483      move.w  #0,d2                       ;x
-00001302                           484      
-00001302                           485      ;set chunk width and height to the screen resol
-00001302  263C 0000042F            486      move.l  #(OUTPUT_WINDOW_WIDTH),d3
-00001308  4843                     487      swap    d3
-0000130A  363C 0320                488      move.w  #(OUTPUT_WINDOW_HEIGHT),d3
-0000130E                           489      
-0000130E  4E75                     490      rts
-00001310                           491  
-00001310                           492  SetBgDrawParams:
-00001310                           493  
-00001310  41F9 0000163E            494      lea BackgroundBitmap, a0
-00001316                           495  
-00001316                           496      ;set draw start position   
-00001316  2239 002A70D8            497      move.l  (BallYPosition),d1           
-0000131C  0681 0000001E            498      add.l   #(BALL_HEIGHT),d1               ;y
-00001322  4841                     499      swap    d1
-00001324  D2B9 002A70D0            500      add.l   (BallXPosition),d1              ;x
-0000132A                           501      ;sub.l   #(BALL_OFFSET),d1
-0000132A                           502      
-0000132A                           503      ;set chunk start position
-0000132A  2439 002A70D8            504      move.l  (BallYPosition),d2              ;y          
-00001330  4842                     505      swap    d2
-00001332  D4B9 002A70D0            506      add.l  (BallXPosition),d2              ;x
-00001338                           507      
-00001338                           508      ;set chunk width and height
-00001338  761E                     509      move.l  #(BALL_WIDTH),d3                ;add offset maybe
-0000133A  4843                     510      swap    d3
-0000133C  363C 001E                511      move.w  #(BALL_HEIGHT),d3               ;add offset maybe
-00001340                           512      
-00001340  4E75                     513      rts
-00001342                           514  
-00001342                           515  SetBallDrawParams:
-00001342                           516  
-00001342  41F9 00275874            517      lea BallBitmap, a0
-00001348                           518  
-00001348                           519      ;set draw start position   
-00001348  721E                     520      move.l  #(BALL_HEIGHT),d1
-0000134A  2E39 002A70DC            521      move.l  (BallYPositionFixed),d7
-00001350  E08F                     522      lsr.l   #(FRACTION_BITS),d7
-00001352  D287                     523      add.l   d7,d1
-00001354                           524      ;update the y position
-00001354  23C7 002A70D8            525      move.l  d7, (BallYPosition)
-0000135A                           526            
-0000135A  4841                     527      swap    d1
-0000135C                           528  
-0000135C  2E39 002A70D4            529      move.l  (BallXPositionFixed),d7
-00001362  E08F                     530      lsr.l   #(FRACTION_BITS),d7
-00001364  3207                     531      move.w  d7, d1
-00001366                           532      ;update the x position
-00001366  23C7 002A70D0            533      move.l  d7, (BallXPosition)
-0000136C                           534  
-0000136C                           535      
-0000136C                           536      ;set chunk start position
-0000136C  7400                     537      move.l  #0,d2 
-0000136E                           538      
-0000136E                           539      ;set chunk width and height
-0000136E  761E                     540      move.l  #(BALL_WIDTH),d3
-00001370  4843                     541      swap    d3
-00001372  363C 001E                542      move.w  #(BALL_HEIGHT),d3
-00001376                           543      
-00001376  4E75                     544      rts
-00001378                           545  
-00001378                           546       
-00001378                           547  DrawPic:
-00001378                           548      ;push the first pixel pos
-00001378  2C48                     549      move.l  a0, a6
-0000137A  4EB9 00001468            550      jsr GetFirstPixelAddress
-00001380  2F0E                     551      move.l  a6, -(sp)                               
-00001382                           552      
-00001382                           553      ;push image width
-00001382  2C48                     554      move.l  a0, a6
-00001384  4EB9 00001480            555      jsr GetImageWidth
-0000138A  2F00                     556      move.l  d0,-(sp)
-0000138C                           557      
-0000138C                           558      ;push image height
-0000138C  2C48                     559      move.l  a0, a6
-0000138E  4EB9 00001490            560      jsr GetImageHeight
-00001394  2F00                     561      move.l  d0,-(sp)
-00001396                           562  
-00001396                           563      ;push the draw start pos
-00001396  4284                     564      clr.l   d4
-00001398  3801                     565      move.w  d1, d4
-0000139A  2F04                     566      move.l  d4,-(sp)    ;push x
-0000139C  4841                     567      swap    d1
-0000139E  3801                     568      move.w  d1,d4
-000013A0  2F04                     569      move.l  d4,-(sp)    ;push y
-000013A2                           570      
-000013A2                           571      ;push the chunk start pos
-000013A2  3802                     572      move.w  d2,d4
-000013A4  2F04                     573      move.l  d4,-(sp)    ;push x
-000013A6                           574      ;convert the y pos of chunk to bitmap coor
-000013A6  4842                     575      swap    d2
-000013A8  3802                     576      move.w  d2,d4
-000013AA  D843                     577      add.w   d3,d4           ;add chunk height
-000013AC                           578      ;d0 have the image height
-000013AC  2200                     579      move.l  d0,d1 
-000013AE  9284                     580      sub.l   d4,d1
-000013B0  2F01                     581      move.l  d1, -(sp)   ;push y
-000013B2                           582      
-000013B2                           583      ;push the chunk dimensions
-000013B2  4843                     584      swap    d3
-000013B4  3803                     585      move.w  d3, d4  
-000013B6  2F04                     586      move.l  d4,-(sp)    ;push width
-000013B8  4843                     587      swap    d3
-000013BA  3803                     588      move.w  d3, d4
-000013BC  2F04                     589      move.l  d4,-(sp)    ;push height
-000013BE                           590   
-000013BE  4EB9 000013CC            591      jsr DrawAChunk
-000013C4                           592      
-000013C4                           593      ;reinit the stack pointer
-000013C4  DFFC 00000028            594      add.l   #(STACK_OFFSET_WHEN_DRAWING),sp
-000013CA  4E75                     595      rts                
-000013CC                           596      
-000013CC                           597  DrawAChunk:
-000013CC                           598      
-000013CC  2E2F 0020                599      move.l  IMAGE_WIDTH_STACK_OFFSET(sp),d7                 ;get the image width into d7
-000013D0  0287 00000003            600      andi.l  #3,d7                                           ;get the rest of division by 4, which is the padding     
-000013D6                           601      
-000013D6  286F 0024                602      move.l  FIRST_PIXEL_ADDRESS_STACK_OFFSET(sp),a4         ;a4 points to the first pixel
-000013DA                           603      
-000013DA  222F 0020                604      move.l  IMAGE_WIDTH_STACK_OFFSET(sp),d1                 ;image width into d1
-000013DE  2401                     605      move.l  d1, d2                                          ;temp value to avoid mul
-000013E0  D282                     606      add.l   d2, d1
-000013E2  D282                     607      add.l   d2, d1                                          ;get the width number of bytes
-000013E4  DE81                     608      add.l   d1,d7                                           ;width bytes
-000013E6                           609      
-000013E6  2407                     610      move.l  d7, d2                                          ;store width bytes into d2
-000013E8                           611      
-000013E8  222F 000C                612      move.l  CHUNK_Y_POS_STACK_OFFSET(sp),d1                 ;get the chunk y pos
-000013EC  C4C1                     613      mulu.w  d1,d2                                           ;mutiply the y with the width bytes to get the y bytes offset
-000013EE                           614      
-000013EE  202F 0010                615      move.l  CHUNK_X_POS_STACK_OFFSET(sp),d0                 ;put chunk x start pos into d0
-000013F2  2200                     616      move.l  d0, d1                                          ;temp value to avoid mul
-000013F4  D081                     617      add.l   d1, d0
-000013F6  D081                     618      add.l   d1, d0                                          ;get the x number of bytes
-000013F8                           619      
-000013F8  D480                     620      add.l   d0,d2                                           ;add the x bytes to the y bytes offset to have the total offset
-000013FA                           621      
-000013FA  D9C2                     622      add.l   d2, a4                                          ;add the offset to get the new first position
-000013FC                           623      
-000013FC  7A00                     624      move.l  #0, d5                                          ;x counter
-000013FE  7C00                     625      move.l  #0, d6                                          ;y counter
-00001400                           626      
-00001400                           627      
-00001400                           628  DrawColumn:
-00001400                           629      ;set pen color
-00001400  4281                     630      clr.l d1
-00001402  121C                     631      move.b   (a4)+,d1                                       ;set blue
-00001404  E189                     632      lsl.l   #8,d1                                           ;shift the byte to the left
-00001406  121C                     633      move.b  (a4)+,d1                                        ;set green
-00001408  E189                     634      lsl.l   #8,d1                                           ;shift the byte to the left
-0000140A  121C                     635      move.b  (a4)+,d1                                        ;set red    => d1 has 00BBGGRR
-0000140C                           636      
-0000140C                           637      ;if green, skip that pixel
-0000140C  B2BC 0000FF00            638      cmp.l   #(GREEN),d1
-00001412  6700 0018                639      beq     NextPixel
-00001416                           640      
-00001416  7050                     641      move.l  #SET_PEN_COLOR_COMMAND, d0
-00001418  4E4F                     642      Trap #15
-0000141A                           643      
-0000141A                           644      ;draw a pixel
-0000141A                           645      ;set x in d1 and y in d2
-0000141A  4281                     646      clr.l   d1
-0000141C  222F 0018                647      move.l  DRAW_X_POS_STACK_OFFSET(sp),d1                                               
-00001420  D285                     648      add.l   d5,d1                                           ;set x position on screen
-00001422                           649      
-00001422  242F 0014                650      move.l  DRAW_Y_POS_STACK_OFFSET(sp),d2
-00001426  9486                     651      sub.l   d6,d2                                           ;set the y position on screen
-00001428                           652      
-00001428  7052                     653      move.l  #DRAW_A_PIXEL_COMMAND, d0
-0000142A  4E4F                     654      Trap #15
-0000142C                           655  
-0000142C                           656  NextPixel:    
-0000142C  5285                     657      addi.l  #1, d5                                          ;increment x counter
-0000142E  202F 0008                658      move.l  CHUNK_WIDTH_STACK_OFFSET(sp),d0
-00001432  BA80                     659      cmp.l  d0,d5
-00001434  66CA                     660      bne DrawColumn                                          ;if not done with the column, continue drawing
-00001436                           661      
-00001436  5286                     662      addi.l  #1, d6                                          ;increment y counter
-00001438  202F 0004                663      move.l  CHUNK_HEIGHT_STACK_OFFSET(sp),d0
-0000143C  BC80                     664      cmp.l   d0,d6
-0000143E  6700 0018                665      beq     DrawEnd                                         ;if done with the rows, then stop drawing
-00001442                           666      
-00001442  7A00                     667      move.l  #0, d5                                          ;reset x counter
-00001444  222F 0008                668      move.l  CHUNK_WIDTH_STACK_OFFSET(sp),d1                 ;put chunk width in d1
-00001448  2001                     669      move.l  d1, d0                                          ;d0 has the temp to avoid mul
-0000144A  D280                     670      add.l   d0, d1
-0000144C  D280                     671      add.l   d0, d1                                          ;multiply it by 3 to get the bytes number
-0000144E                           672      
-0000144E  2007                     673      move.l  d7, d0                                          ;d0 = width bytes
-00001450  9081                     674      sub.l   d1,d0                                           ;sub the chunk bytes from the width bytes
-00001452  D9C0                     675      add.l   d0, a4                                          ;and then add it to a4 to get the next pixel
-00001454                           676      
-00001454  4EF8 1400                677      jmp DrawColumn                                          ;draw next column
-00001458                           678  
-00001458                           679  DrawEnd:
-00001458                           680  
-00001458  4E75                     681      rts
-0000145A                           682  
-0000145A                           683  
-0000145A                           684  EnableDoubleBuffer:
-0000145A                           685      ;double buffering mode enabled
-0000145A  705C                     686      move.l  #SET_DRAWING_MODE_COMMAND, d0
-0000145C  7211                     687      move.l  #DOUBLE_BUFFERING_MODE, d1
-0000145E  4E4F                     688      Trap    #15
-00001460                           689  
-00001460  4E75                     690      rts
-00001462                           691  
-00001462                           692  PaintScreenBuffer:
-00001462                           693      ;repaint screen from buffer
-00001462  705E                     694      move.l  #REPAINT_SCREEN_COMMAND, d0
-00001464  4E4F                     695      Trap    #15
-00001466                           696          
-00001466  4E75                     697      rts    
-00001468                           698  
-00001468                           699  ;param a6:image address
-00001468                           700  GetFirstPixelAddress:
-00001468  DDFC 0000000A            701      add.l   #(OFFSET_TO_PIXEL_ARRAY),a6                     ;a6 has the pixel offset address
-0000146E  2016                     702      move.l  (a6),d0                                         ;put it in d0
-00001470  4EB9 000014A0            703      jsr SwapBytes                                           ;swap to get the right value
-00001476  DDC0                     704      add.l   d0,a6                                           ;a6 has the 0, h-1 pixel address
-00001478  9DFC 0000000A            705      sub.l   #(OFFSET_TO_PIXEL_ARRAY),a6
-0000147E                           706      
-0000147E  4E75                     707      rts
-00001480                           708  
-00001480                           709  ;param a6:imaage address, return d0: image width
-00001480                           710  
-00001480                           711  GetImageWidth:
-00001480  DDFC 00000012            712      add.l   #(OFFSET_IMAGE_WIDTH),a6                        ;a6 has the image width address
-00001486  2016                     713      move.l  (a6),d0                                         ;put it in d0
-00001488  4EB9 000014A0            714      jsr SwapBytes                                           ;swap to get the right value
-0000148E                           715      
-0000148E  4E75                     716      rts
-00001490                           717  
-00001490                           718  ;param a6:imaage address, return d0: image height
-00001490                           719  GetImageHeight:
-00001490  DDFC 00000016            720      add.l   #(OFFSET_IMAGE_HEIGHT),a6                       ;a6 has the image width address
-00001496  2016                     721      move.l  (a6),d0                                         ;put it in d0
-00001498  4EB9 000014A0            722      jsr SwapBytes                                           ;swap to get the right value
-0000149E                           723  
-0000149E  4E75                     724      rts
-000014A0                           725  
-000014A0                           726  
-000014A0                           727  SwapBytes:
-000014A0                           728      ;DDCCBBAA
-000014A0  E158                     729      rol.w   #8,d0   ;DDCCAABB
-000014A2  4840                     730      swap.w    d0    ;AABBDDCC
-000014A4  E158                     731      rol.w   #8,d0   ;AABBCCDD
-000014A6                           732      
-000014A6  4E75                     733      rts
-000014A8                           734  
-000014A8                           735  
-000014A8                           736          
-000014A8                           737  
-000014A8                           738  
-000014A8                           739  
-000014A8                           740  
-000014A8                           741  
-000014A8                           742  
-000014A8                           743  
-000014A8                           744  
-000014A8                           745  
-000014A8                           746  
-000014A8                           747  -------------------- end include --------------------
-000014A8                           748      include "CollisionModule.x68"
-000014A8                           749  ;Collision stuff file
-000014A8                           750  
-000014A8                           751  CheckWallCollision:
-000014A8                           752  
-000014A8                           753      ;check if in bounds
-000014A8  0CB9 00000139 002A70D0   754      cmp.l   #(TOP_LEFT_BOARD_X_POS), (BallXPosition)
-000014B2  6F00 0018                755      ble     .Collided
-000014B6                           756  
-000014B6  0CB9 000002D7 002A70D0   757      cmp.l   #(BOTTOM_RIGHT_BOARD_X_POS-BALL_WIDTH), (BallXPosition)
-000014C0  6C00 000A                758      bge     .Collided
-000014C4                           759  
-000014C4  7000                     760      move.l  #(FALSE),d0
-000014C6                           761  
-000014C6  4EF9 000014CE            762      jmp .EndCheck
-000014CC                           763  
-000014CC                           764  .Collided:
-000014CC                           765  
-000014CC  7001                     766      move.l  #(TRUE), d0
-000014CE                           767  
-000014CE                           768  .EndCheck:
-000014CE                           769  
-000014CE  4E75                     770      rts
-000014D0                           771  
-000014D0                           772  
-000014D0                           773  CheckPegCollision:
-000014D0                           774      
-000014D0                           775      ;movem.l    ALL_REG, -(sp)
-000014D0                           776      ;set params
-000014D0  2039 002A70D0            777      move.l  (BallXPosition), d0
-000014D6  0680 0000000F            778      add.l   #(BALL_RADIUS), d0  ;shift to center
-000014DC  2239 002A70D8            779      move.l  (BallYPosition), d1
-000014E2  0681 0000000F            780      add.l   #(BALL_RADIUS), d1  ;shift to center
-000014E8                           781  
-000014E8  242F 0008                782      move.l  CURRENT_PEG_X_STACK_OFFSET(sp),d2
-000014EC  262F 0004                783      move.l  CURRENT_PEG_Y_STACK_OFFSET(sp),d3
-000014F0                           784  
-000014F0                           785      ;check if we even should do collision check
-000014F0                           786      ;dy is first
-000014F0  B681                     787      cmp.l   d1,d3 
-000014F2  6C00 000C                788      bge     .SubBallYPegY ; if peg y bigger
-000014F6                           789      
-000014F6  9283                     790      sub.l   d3,d1
-000014F8  2A01                     791      move.l  d1,d5               ;dy
-000014FA  4EF9 00001504            792      jmp     .CheckDy
-00001500                           793  
-00001500                           794  .SubBallYPegY:
-00001500                           795  
-00001500  9681                     796      sub.l   d1,d3
-00001502  2A03                     797      move.l  d3, d5              ;dy
-00001504                           798  
-00001504                           799  .CheckDy:
-00001504                           800  
-00001504  BABC 00000018            801      cmp.l   #(MIN_DY_TO_CHECK_COLLISION), d5
-0000150A  6E00 005E                802      bgt     .DidntCollide
-0000150E                           803  
-0000150E                           804      ;dx is second
-0000150E  B480                     805      cmp.l   d0,d2 
-00001510  6C00 000C                806      bge     .SubBallXPegX ; if peg x bigger
-00001514                           807      
-00001514  9082                     808      sub.l   d2,d0
-00001516  2800                     809      move.l  d0,d4               ;dx
-00001518  4EF9 00001522            810      jmp     .CheckDx
-0000151E                           811  
-0000151E                           812  .SubBallXPegX:
-0000151E                           813  
-0000151E  9480                     814      sub.l   d0,d2
-00001520  2802                     815      move.l  d2, d4              ;dx
-00001522                           816  
-00001522                           817  .CheckDx:
-00001522                           818  
-00001522  B8BC 00000018            819      cmp.l   #(MIN_DX_TO_CHECK_COLLISION), d4
-00001528  6E00 0040                820      bgt     .DidntCollide
-0000152C                           821  
-0000152C                           822      ;store the closest peg coor
-0000152C  23EF 0008 002A7100       823      move.l  CURRENT_PEG_X_STACK_OFFSET(sp),(ClosestPegX)
-00001534  23EF 0004 002A7104       824      move.l  CURRENT_PEG_Y_STACK_OFFSET(sp),(ClosestPegY)
-0000153C                           825  
-0000153C                           826      ;if we're here. we check for collision
-0000153C  2004                     827      move.l  d4,d0   ;dx
-0000153E  C0C4                     828      mulu.w  d4,d0   ;d0 = dx^2
-00001540  2205                     829      move.l  d5,d1   ;dy
-00001542  C2C5                     830      mulu.w  d5,d1   ;d1 = dy^2
-00001544                           831  
-00001544  D280                     832      add.l   d0, d1  ;d1 = dx^2 + dy^2
-00001546  E589                     833      lsl.l   #2, d1  
-00001548  4DF9 00276374            834      lea     (Sqrts), a6
-0000154E                           835  
-0000154E  2036 1000                836      move.l  (a6, d1), d0    ;d0 = sqrt(dx^2 + dy^2) with no byte swap
-00001552                           837      
-00001552  4EB8 14A0                838      jsr     SwapBytes       ;d0 bytes are swapped, so it has the correct sqrt
-00001556                           839  
-00001556  E088                     840      lsr.l   #(FRACTION_BITS),d0
-00001558                           841  
-00001558                           842      ;combine radiuses
-00001558  720F                     843      move.l  #(BALL_RADIUS), d1
-0000155A  5E81                     844      add.l   #(PEG_RADIUS), d1
-0000155C                           845  
-0000155C  B081                     846      cmp.l   d1, d0
-0000155E  6E00 000A                847      bgt     .DidntCollide
-00001562                           848  
-00001562  7001                     849      move.l  #(TRUE), d0
-00001564                           850  
-00001564  4EF9 0000156C            851      jmp     .CheckEnd
-0000156A                           852  
-0000156A                           853  
-0000156A                           854  .DidntCollide:
-0000156A                           855  
-0000156A  7000                     856      move.l  #(FALSE), d0
-0000156C                           857  
-0000156C                           858  .CheckEnd:
-0000156C                           859      ;movem.l    (sp)+, ALL_REG
-0000156C                           860  
-0000156C  4E75                     861      rts
-0000156E                           862  
-0000156E                           863  
-0000156E                           864  BounceBallOffWall:
-0000156E                           865  
-0000156E  2039 002A70E0            866      move.l  (BallXVelocity), d0
-00001574  C1FC 0080                867      muls.w  #(HALF), d0     
-00001578  E080                     868      asr.l   #(FRACTION_BITS),d0     ;soften collision
-0000157A                           869  
-0000157A  4480                     870      neg.l   d0
-0000157C  23C0 002A70E0            871      move.l  d0, (BallXVelocity)
-00001582                           872  
-00001582  4E75                     873      rts
-00001584                           874  
-00001584                           875  
-00001584                           876  
-00001584                           877  BounceBallOffPeg:
-00001584                           878  
-00001584                           879      ;set tangent vect
-00001584  2039 002A7104            880      move.l  (ClosestPegY),d0
-0000158A  90B9 002A70D8            881      sub.l   (BallYPosition), d0     
-00001590  0680 0000000F            882      add.l   #(BALL_RADIUS), d0      ;d0 = tgX = Ypeg - Yball
-00001596  2239 002A70D0            883      move.l  (BallXPosition), d1
-0000159C  92B9 002A7100            884      sub.l   (ClosestPegX), d1       
-000015A2  0681 0000000F            885      add.l   #(BALL_RADIUS), d1      ;d1 = tgY = Xball - Xpeg
-000015A8                           886  
-000015A8                           887  
-000015A8                           888      ;get vect length
-000015A8  2C00                     889      move.l  d0, d6
-000015AA  2E01                     890      move.l  d1, d7
-000015AC                           891  
-000015AC  CDC0                     892      muls.w  d0, d6                  ;d6 = tgX ^ 2
-000015AE  CFC1                     893      muls.w  d1, d7                  ;d7 = tgY ^ 2
-000015B0                           894  
-000015B0  DE86                     895      add.l   d6, d7                  ;d7 = tgX ^ 2 + tgY ^ 2
-000015B2                           896  
-000015B2  E58F                     897      lsl.l   #2, d7  
-000015B4  4DF9 00276374            898      lea     (Sqrts), a6
-000015BA                           899  
-000015BA  2436 7000                900      move.l  (a6, d7), d2            ;d2 = TgMag = sqrt(tgX ^ 2 + tgY ^ 2) with no byte swap
-000015BE                           901  
-000015BE  2E00                     902      move.l  d0, d7                  ;store tgX
-000015C0  2002                     903      move.l  d2, d0
-000015C2                           904      
-000015C2  4EB8 14A0                905      jsr     SwapBytes               
-000015C6  E088                     906      lsr.l   #(FRACTION_BITS),d0
-000015C8                           907  
-000015C8  2400                     908      move.l  d0, d2                  ;d2 bytes are swapped, so it has the correct sqrt
-000015CA  2007                     909      move.l  d7, d0                  ;restore d0
-000015CC                           910  
-000015CC                           911  
-000015CC                           912      ;get normalized tangent
-000015CC  81C2                     913      divs.w  d2, d0                  ;Xtg
-000015CE  4840                     914      swap    d0
-000015D0  4240                     915      clr.w   d0
-000015D2  4840                     916      swap    d0
-000015D4  83C2                     917      divs.w  d2, d1                  ;Ytg
-000015D6  4841                     918      swap    d1
-000015D8  4241                     919      clr.w   d1
-000015DA  4841                     920      swap    d1
-000015DC                           921  
-000015DC                           922  
-000015DC                           923      ;get length by calculating the dot product
-000015DC                           924      ;copy x and y
-000015DC  2400                     925      move.l  d0, d2                  ;Xtg
-000015DE  2601                     926      move.l  d1, d3                  ;Ytg
-000015E0                           927  
-000015E0                           928      ;get velocity
-000015E0  2C39 002A70E0            929      move.l  (BallXVelocity), d6
-000015E6  2E39 002A70E4            930      move.l  (BallYVelocity), d7
-000015EC                           931      ; dot product
-000015EC  C5C6                     932      muls.w  d6, d2                  
-000015EE  C7C7                     933      muls.w  d7, d3
-000015F0                           934  
-000015F0  E082                     935      asr.l   #(FRACTION_BITS),d2
-000015F2  E083                     936      asr.l   #(FRACTION_BITS),d3
-000015F4                           937  
-000015F4                           938  
-000015F4  D682                     939      add.l   d2, d3                  
-000015F6  2803                     940      move.l  d3, d4                  ;d4 = length
-000015F8                           941  
-000015F8                           942      ;get the velocity comp parallel to the tg
-000015F8                           943      ;copy x and y of tg
-000015F8  2400                     944      move.l  d0, d2                  ;Xtg
-000015FA  2601                     945      move.l  d1, d3                  ;Ytg
-000015FC                           946  
-000015FC  C5C4                     947      muls.w  d4, d2                  ;d2 = Xparal = length * Xtg
-000015FE  C7C4                     948      muls.w  d4, d3                  ;d3 = Yparal = length * Ytg
-00001600                           949  
-00001600                           950      ;get velocity
-00001600  2039 002A70E0            951      move.l  (BallXVelocity), d0     ;Xvel
-00001606  2239 002A70E4            952      move.l  (BallYVelocity), d1     ;Yvel
-0000160C                           953  
-0000160C                           954      ;get the velocity comp perpendicular to the tg
-0000160C  9082                     955      sub.l   d2, d0                  ;d0 = Xper = Xvel - Xparal
-0000160E  9283                     956      sub.l   d3, d1                  ;d1 = Yper = Yvel - Yparal
-00001610                           957  
-00001610                           958      ;get the new velocity
-00001610  E580                     959      asl.l   #2, d0  
-00001612  E581                     960      asl.l   #2, d1
-00001614                           961  
-00001614  2439 002A70E0            962      move.l  (BallXVelocity), d2     ;Xvel
-0000161A  2639 002A70E4            963      move.l  (BallYVelocity), d3     ;Yvel
-00001620                           964          
-00001620  9480                     965      sub.l   d0, d2                  ;d2 = NewXvel = Xvel - 2 * Xper
-00001622  9681                     966      sub.l   d1, d3                  ;d3 = NewYvel = Yvel - 2 * Yper
-00001624                           967  
-00001624  C5FC 0080                968      muls.w  #(HALF), d2     ;soften collision
-00001628  E082                     969      asr.l   #(FRACTION_BITS),d2 
-0000162A  C7FC 001A                970      muls.w  #(ONE_TENTH), d3
-0000162E  E083                     971      asr.l   #(FRACTION_BITS),d3
-00001630                           972  
-00001630                           973  
-00001630                           974      ;update the velocity
-00001630  23C2 002A70E0            975      move.l  d2, (BallXVelocity)
-00001636  23C3 002A70E4            976      move.l  d3, (BallYVelocity)
-0000163C                           977  
-0000163C                           978  
-0000163C  4E75                     979      rts
-0000163E                           980  
-0000163E                           981  
-0000163E                           982  
-0000163E                           983  
-0000163E                           984  
-0000163E                           985  
-0000163E                           986  
-0000163E                           987  
-0000163E                           988  
-0000163E                           989  
-0000163E                           990  -------------------- end include --------------------
-0000163E                           991  
-0000163E                           992  
-0000163E                           993  
-0000163E                           994  ;bitmaps
-0000163E                           995  BackgroundBitmap    INCBIN "bg.bmp"
-00275874                           996  BallBitmap          INCBIN "ironBall.bmp"
-00276374                           997  
-00276374                           998  ;sqrts
-00276374                           999  Sqrts               INCBIN  "Sqrts.bin" 
-002A70B4                          1000  
-002A70B4                          1001  ;input
-002A70B4= 00000000                1002  PlayerInput         dc.l    0 ;nothing
-002A70B8                          1003  
-002A70B8                          1004  ;frame rate
-002A70B8= 00000000                1005  FrameBeginTime      dc.l    0
-002A70BC                          1006  
-002A70BC                          1007  ;ball variables
-002A70BC= 00001096 00001098 ...   1008  BallCalls           dc.l    EndBallUpdate, DropBall, MoveBallToLeft, MoveBallToRight
-002A70CC= 00                      1009  BallDropped         dc.b    (FALSE)
-002A70CD= 00                      1010  BallMoved           dc.b    (FALSE)
-002A70CE= 00                      1011  BallJustCollided    dc.b    (FALSE)
-002A70D0= 00000139                1012  BallXPosition       dc.l    (BALL_INITIAL_X_POS)     
-002A70D4= 00013900                1013  BallXPositionFixed  dc.l    (BALL_INITIAL_X_POS<<FRACTION_BITS)
-002A70D8= 0000002A                1014  BallYPosition       dc.l    (BALL_INITIAL_Y_POS)     
-002A70DC= 00002A00                1015  BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
-002A70E0= 00000000                1016  BallXVelocity       dc.l    (BALL_INIT_X_VELOCITY)
-002A70E4= 00000000                1017  BallYVelocity       dc.l    (BALL_INIT_Y_VELOCITY)
-002A70E8                          1018  
-002A70E8= 0000021A 000001CA ...   1019  PegsXs              dc.l    538, 458, 589
-002A70F4= 00000135 00000162 ...   1020  PegsYs              dc.l    309, 354, 219
-002A7100= 00000000                1021  ClosestPegX         dc.l    0
-002A7104= 00000000                1022  ClosestPegY         dc.l    0
-002A7108= 0000000C                1023  NumberOfPegs        dc.l    (PegsYs-PegsXs)
-002A710C= 00000000                1024  LoopCounter         dc.l    0
-002A7110                          1025  
-002A7110                          1026      END    START
+00001000                           122  ;random numbers
+00001000  =00000199                123  MAX_RAND_X_VELOCITY     EQU $199
+00001000  =00000100                124  MIN_RAND_X_VELOCITY     EQU $100
+00001000  =00000150                125  MIN_RAND_X_VEL_ALLOWED  EQU $150
+00001000                           126  
+00001000                           127  
+00001000                           128  
+00001000                           129  
+00001000                           130  
+00001000                           131  
+00001000                           132  
+00001000                           133  
+00001000                           134  
+00001000                           135  -------------------- end include --------------------
+00001000                           136  
+00001000                           137  Main:
+00001000                           138      
+00001000  4EB9 00001056            139      jsr SetOutputWindow
+00001006  4EB9 00001226            140      jsr SetSomeVars 
+0000100C  4EB9 00001476            141      jsr EnableDoubleBuffer
+00001012  4EB9 000012B4            142      jsr DrawAllBackground
+00001018  4EB9 000012DC            143      jsr DrawBallFirstTime
+0000101E  4EB9 0000147E            144      jsr PaintScreenBuffer
+00001024                           145      
+00001024                           146  GameLoop:
+00001024                           147      
+00001024  4EB9 00001204            148      jsr SetFrameBeginTime
+0000102A                           149  
+0000102A  4EB9 00001242            150      jsr HandleInput
+00001030                           151      
+00001030  4EB9 00001068            152      jsr UpdateBallPosition
+00001036                           153  
+00001036  4EB9 000012C2            154      jsr DrawBackgroundChunk
+0000103C  4EB9 000012EA            155      jsr DrawBall
+00001042                           156  
+00001042  4EB9 00001210            157      jsr WaitToEndFrame
+00001048                           158      
+00001048  4EB9 0000147E            159      jsr PaintScreenBuffer
+0000104E                           160  
+0000104E  4EF8 1024                161      jmp GameLoop          
+00001052                           162      
+00001052  4E72 3000                163      STOP    #$3000                     
+00001056                           164  
+00001056                           165  SetOutputWindow:
+00001056                           166  
+00001056                           167      ;set the output window dimensions
+00001056  7021                     168      move.l  #SET_OUTPUT_WINDOW_COMMAND, d0
+00001058  223C 0000042F            169      move.l  #OUTPUT_WINDOW_WIDTH, d1
+0000105E  4841                     170      swap.w  d1
+00001060  323C 0320                171      move.w  #OUTPUT_WINDOW_HEIGHT, d1
+00001064  4E4F                     172      Trap    #15
+00001066                           173  
+00001066  4E75                     174      rts
+00001068                           175  
+00001068                           176  
+00001068                           177  UpdateBallPosition:
+00001068                           178  
+00001068                           179      ;initialize ball moved to false
+00001068  13FC 0000 002A6BCD       180      move.b  #(FALSE), (BallMoved)
+00001070                           181  
+00001070                           182      ;see if the ball is already dropped
+00001070  0C39 0001 002A6BCC       183      cmp.b   #(TRUE), (BallDropped)
+00001078  6700 008C                184      beq     BallDropping
+0000107C                           185      
+0000107C                           186      ;depending on user input, call drop or Move
+0000107C  2039 002A6BB4            187      move.l  (PlayerInput), d0
+00001082  E588                     188      lsl.l   #2,d0
+00001084  43F9 002A6BBC            189      lea BallCalls, a1
+0000108A  2231 0000                190      move.l  (a1, d0),d1
+0000108E                           191      
+0000108E                           192      ;avoid null calls
+0000108E  0C81 00000000            193      cmpi.l  #0, d1
+00001094  6700 0006                194      beq     EndBallUpdate
+00001098                           195      
+00001098  2441                     196      move.l  d1,a2
+0000109A  4ED2                     197      jmp     (a2)
+0000109C                           198  
+0000109C                           199  EndBallUpdate:
+0000109C                           200      
+0000109C  4E75                     201      rts
+0000109E                           202  
+0000109E                           203  DropBall:
+0000109E                           204  
+0000109E  13FC 0001 002A6BCC       205      move.b  #(TRUE), (BallDropped)
+000010A6                           206  
+000010A6  4EF8 109C                207      jmp     EndBallUpdate
+000010AA                           208  
+000010AA                           209  MoveBallToLeft:
+000010AA                           210  
+000010AA                           211      ;check if in bounds
+000010AA  0CB9 00000139 002A6BD0   212      cmp.l   #(TOP_LEFT_BOARD_X_POS), (BallXPosition)
+000010B4  6F00 001E                213      ble     .DontMove
+000010B8                           214  
+000010B8  2039 002A6BD0            215      move.l  (BallXPosition),d0
+000010BE  E188                     216      lsl.l   #8,d0
+000010C0                           217  
+000010C0  0480 00000250            218      sub.l   #(BALL_SLIDE_VELOCITY), d0
+000010C6  23C0 002A6BD4            219      move.l  d0, (BallXPositionFixed)
+000010CC                           220  
+000010CC                           221      ;ball moved
+000010CC  13FC 0001 002A6BCD       222      move.b  #(TRUE), (BallMoved)
+000010D4                           223  
+000010D4                           224  .DontMove:
+000010D4                           225  
+000010D4  4EF8 109C                226      jmp     EndBallUpdate
+000010D8                           227  
+000010D8                           228  MoveBallToRight:
+000010D8                           229  
+000010D8                           230      ;check if in bounds
+000010D8  0CB9 000002E1 002A6BD0   231      cmp.l   #(BOTTOM_RIGHT_BOARD_X_POS-BALL_WIDTH), (BallXPosition)
+000010E2  6C00 001E                232      bge     .DontMove
+000010E6                           233  
+000010E6  2039 002A6BD0            234      move.l  (BallXPosition),d0
+000010EC  E188                     235      lsl.l   #8,d0
+000010EE                           236      
+000010EE  0680 00000250            237      add.l   #(BALL_SLIDE_VELOCITY), d0
+000010F4  23C0 002A6BD4            238      move.l  d0, (BallXPositionFixed)
+000010FA                           239  
+000010FA                           240      ;ball moved
+000010FA  13FC 0001 002A6BCD       241      move.b  #(TRUE), (BallMoved)
+00001102                           242  
+00001102                           243  .DontMove:
+00001102                           244  
+00001102  4EF8 109C                245      jmp     EndBallUpdate
+00001106                           246  
+00001106                           247  
+00001106                           248  BallDropping:
+00001106                           249  
+00001106  4EB9 000014C4            250      jsr     CheckWallCollision
+0000110C  B0BC 00000001            251      cmp.l   #(TRUE), d0
+00001112  6600 000E                252      bne     .MoveOnToPegs 
+00001116                           253  
+00001116  0C39 0001 002A6BCE       254      cmp.b   #(TRUE), (BallJustCollided)
+0000111E  6600 0070                255      bne     .JustWallCollided
+00001122                           256  
+00001122                           257      ;jmp    .ContinueBallUpdate
+00001122                           258  
+00001122                           259  
+00001122                           260  .MoveOnToPegs:
+00001122                           261      ;check collisions with pegs
+00001122                           262  
+00001122  43F9 002A6BE8            263      lea     PegsXs, a1
+00001128  45F9 002A6D50            264      lea     PegsYs, a2
+0000112E  2E39 002A6EC0            265      move.l  (NumberOfPegs), d7
+00001134                           266  
+00001134                           267  .NextPeg:
+00001134                           268      
+00001134                           269      ;get current peg
+00001134  2039 002A6EC4            270      move.l (LoopCounter), d0
+0000113A  E588                     271      lsl.l   #2, d0
+0000113C  2F31 0000                272      move.l  (a1, d0), -(sp) ;push y to the stack
+00001140  2F32 0000                273      move.l  (a2, d0), -(sp) ;push x to the stack
+00001144                           274  
+00001144  4EB9 000014EC            275      jsr     CheckPegCollision
+0000114A                           276      ;free stack
+0000114A  508F                     277      add.l   #(STACK_OFFSET_IN_PEG_COL), sp
+0000114C                           278  
+0000114C  B0BC 00000001            279      cmp.l   #(TRUE), d0     ;if colliding, end the loop
+00001152  6700 001C                280      beq     .EndPegLoop
+00001156                           281  
+00001156  52B9 002A6EC4            282      add.l   #1, (LoopCounter) 
+0000115C  5387                     283      sub.l   #1, d7          ;else, if there are other oegs, check them, else no collision in this frame
+0000115E  66D4                     284      bne     .NextPeg
+00001160                           285  
+00001160                           286      ;reinit loop counter
+00001160  23FC 00000000 002A6EC4   287      move.l  #0, (LoopCounter)
+0000116A                           288  
+0000116A  4EF9 00001182            289      jmp     .NotColliding
+00001170                           290  
+00001170                           291  .EndPegLoop:
+00001170                           292      ;check if it just collided
+00001170  0C39 0001 002A6BCE       293      cmp.b   #(TRUE), (BallJustCollided)
+00001178  6600 002A                294      bne     .JustPegCollided
+0000117C                           295  
+0000117C  4EF9 000011B8            296      jmp     .ContinueBallUpdate
+00001182                           297  
+00001182                           298  .NotColliding:
+00001182                           299  
+00001182  13FC 0000 002A6BCE       300      move.b  #(FALSE), (BallJustCollided)
+0000118A  4EF9 000011B8            301      jmp     .ContinueBallUpdate
+00001190                           302  
+00001190                           303  .JustWallCollided:  
+00001190                           304  
+00001190                           305      ;bounce
+00001190  4EB9 0000158A            306      jsr BounceBallOffWall
+00001196                           307  
+00001196  13FC 0001 002A6BCE       308      move.b  #(TRUE), (BallJustCollided)
+0000119E  4EF9 00001200            309      jmp     .DontMove
+000011A4                           310      ;jmp    .ContinueBallUpdate
+000011A4                           311      ;jmp    .MoveOnToPegs
+000011A4                           312  
+000011A4                           313  
+000011A4                           314  .JustPegCollided:   
+000011A4                           315  
+000011A4                           316      ;bounce
+000011A4  4EB9 0000159A            317      jsr BounceBallOffPeg
+000011AA                           318  
+000011AA  13FC 0001 002A6BCE       319      move.b  #(TRUE), (BallJustCollided)
+000011B2  4EF9 00001200            320      jmp     .DontMove
+000011B8                           321      ;jmp    .ContinueBallUpdate
+000011B8                           322  
+000011B8                           323  .ContinueBallUpdate:
+000011B8                           324  .SkipBounceOffPeg:
+000011B8                           325  
+000011B8  0CB9 00000286 002A6BD8   326      cmp.l   #(BOTTOM_RIGHT_BOARD_Y_POS-BALL_HEIGHT), (BallYPosition)
+000011C2  6C00 003C                327      bge     .DontMove ;reached destination, do something **************************************************************
+000011C6                           328  
+000011C6                           329      ;update x pos
+000011C6  2039 002A6BD0            330      move.l  (BallXPosition),d0
+000011CC  E188                     331      lsl.l   #8,d0
+000011CE                           332      
+000011CE  D0B9 002A6BE0            333      add.l   (BallXVelocity), d0
+000011D4  23C0 002A6BD4            334      move.l  d0, (BallXPositionFixed)
+000011DA                           335  
+000011DA                           336  
+000011DA                           337      ;update Y vel
+000011DA  06B9 00000015 002A6BE4   338      add.l   #(BALL_Y_ACCELERATION), (BallYVelocity)
+000011E4                           339  
+000011E4                           340      ;add the velocity to the y pos
+000011E4  2039 002A6BD8            341      move.l  (BallYPosition),d0
+000011EA  E188                     342      lsl.l   #8,d0
+000011EC                           343      
+000011EC  D0B9 002A6BE4            344      add.l   (BallYVelocity), d0
+000011F2  23C0 002A6BDC            345      move.l  d0, (BallYPositionFixed)
+000011F8                           346  
+000011F8  13FC 0001 002A6BCD       347      move.b  #(TRUE), BallMoved
+00001200                           348  
+00001200                           349  
+00001200                           350  .DontMove:
+00001200                           351  
+00001200  4EF8 109C                352      jmp     EndBallUpdate
+00001204                           353  
+00001204                           354  
+00001204                           355  
+00001204                           356  SetFrameBeginTime:
+00001204                           357  
+00001204                           358      ;get current time
+00001204  7008                     359      move.l  #(GET_TIME_COMMAND), d0
+00001206  4E4F                     360      Trap    #15
+00001208                           361      ;set FrameBeginTime
+00001208  23C1 002A6BB8            362      move.l  d1, (FrameBeginTime)
+0000120E                           363  
+0000120E  4E75                     364      rts
+00001210                           365  
+00001210                           366  
+00001210                           367  WaitToEndFrame:
+00001210                           368  
+00001210  2439 002A6BB8            369      move.l  (FrameBeginTime),d2
+00001216                           370  
+00001216                           371  .LoopAgain:
+00001216                           372      ;get current time
+00001216  7008                     373      move.l  #(GET_TIME_COMMAND), d0
+00001218  4E4F                     374      Trap    #15
+0000121A                           375      
+0000121A                           376      ;get DeltaTime in d1
+0000121A  9282                     377      sub.l   d2,d1
+0000121C                           378  
+0000121C  B2BC 00000001            379      cmp.l   #(TIME_PER_FRAME), d1
+00001222  6DF2                     380      blt     .LoopAgain
+00001224                           381  
+00001224  4E75                     382      rts
+00001226                           383  
+00001226                           384  SetSomeVars:
+00001226                           385  
+00001226  4EB9 0000171A            386      jsr     SeedRandomNumber
+0000122C  4EB9 00001234            387      jsr     RandomizeXVel
+00001232                           388  
+00001232  4E75                     389      rts
+00001234                           390  
+00001234                           391  
+00001234                           392  RandomizeXVel:
+00001234                           393  
+00001234  4EB9 00001680            394      jsr     GetRandomXVel
+0000123A  23C0 002A6BE0            395      move.l  d0, (BallXVelocity)
+00001240                           396  
+00001240  4E75                     397      rts
+00001242                           398  
+00001242                           399  
+00001242                           400  
+00001242                           401      include "InputHandler.x68"
+00001242                           402  
+00001242                           403  
+00001242                           404  HandleInput:  
+00001242                           405  
+00001242                           406      ;reset PlayerInput
+00001242  23FC 00000000 002A6BB4   407      move.l  #0,(PlayerInput)
+0000124C                           408      ;Set the inputs    
+0000124C  7013                     409      move.l  #(INPUT_COMMAND),d0
+0000124E                           410      ;d1: $00202527 => space, left arrow, right arrow
+0000124E                           411      ;move.l  $20<<$16+$25<<$8+$27,d1
+0000124E  7220                     412      move.l  #(SPACE_KEY),d1
+00001250  E189                     413      lsl.l   #8,d1
+00001252  123C 0025                414      move.b  #(LEFT_ARROW),d1
+00001256  E189                     415      lsl.l   #8,d1
+00001258  123C 0027                416      move.b  #(RIGHT_ARROW),d1
+0000125C                           417  
+0000125C  4E4F                     418      Trap    #15
+0000125E                           419  
+0000125E                           420      ;check if ball is droped, if yes skip
+0000125E  0C39 0001 002A6BCC       421      cmpi.b  #(TRUE),(BallDropped)
+00001266  6700 001A                422      beq     EndHandleInput
+0000126A                           423  
+0000126A                           424      ;check the pressed key and call subroutines accordingly
+0000126A  0801 0010                425      btst.l  #(SPACE_KEY_LOCATION), d1       
+0000126E  6600 0014                426      bne     DropBallInput
+00001272                           427  
+00001272  0801 0008                428      btst.l  #(LEFT_ARROW_LOCATION), d1       
+00001276  6600 001A                429      bne     MoveBallToLeftInput
+0000127A                           430  
+0000127A  0801 0000                431      btst.l  #(RIGHT_ARROW_LOCATION), d1       
+0000127E  6600 0026                432      bne     MoveBallToRightInput
+00001282                           433  
+00001282                           434  EndHandleInput:
+00001282                           435  
+00001282  4E75                     436      rts
+00001284                           437  
+00001284                           438  DropBallInput:
+00001284                           439  
+00001284  23FC 00000001 002A6BB4   440      move.l #1,(PlayerInput)
+0000128E                           441  
+0000128E  4EF8 1282                442      jmp EndHandleInput
+00001292                           443  
+00001292                           444  MoveBallToLeftInput:
+00001292                           445      
+00001292                           446      ;if both arrows are pressed, do nothing
+00001292  0801 0000                447      btst.l  #(RIGHT_ARROW_LOCATION), d1       
+00001296  66EA                     448      bne     EndHandleInput
+00001298                           449  
+00001298  23FC 00000002 002A6BB4   450      move.l #2,(PlayerInput)
+000012A2                           451  
+000012A2  4EF8 1282                452      jmp     EndHandleInput
+000012A6                           453  
+000012A6                           454  MoveBallToRightInput:
+000012A6                           455      
+000012A6  23FC 00000003 002A6BB4   456      move.l #3,(PlayerInput)  
+000012B0                           457  
+000012B0  4EF8 1282                458      jmp     EndHandleInput
+000012B4                           459    
+000012B4                           460  -------------------- end include --------------------
+000012B4                           461      include "drawingModule.X68"
+000012B4                           462  ; this module contains drawing related subroutines
+000012B4                           463  
+000012B4                           464  DrawAllBackground:
+000012B4                           465      
+000012B4                           466      ;a0 has the address to the bitmap
+000012B4  4EB9 00001304            467      jsr SetFirstDrawParams
+000012BA  4EB9 00001394            468      jsr DrawPic
+000012C0                           469  
+000012C0  4E75                     470      rts
+000012C2                           471  
+000012C2                           472  DrawBackgroundChunk:
+000012C2                           473      
+000012C2  0C39 0000 002A6BCD       474      cmp.b #(FALSE),(BallMoved)
+000012CA  6700 000E                475      beq .DontDraw
+000012CE                           476      
+000012CE  4EB9 0000132C            477      jsr SetBgDrawParams
+000012D4  4EB9 00001394            478      jsr DrawPic
+000012DA                           479  
+000012DA                           480  .DontDraw:
+000012DA  4E75                     481      rts
+000012DC                           482  
+000012DC                           483  DrawBallFirstTime:
+000012DC                           484  
+000012DC  13FC 0001 002A6BCD       485      move.b  #(TRUE), (BallMoved)
+000012E4                           486  
+000012E4  4EF9 000012EA            487      jmp     DrawBall
+000012EA                           488  
+000012EA                           489  DrawBall:
+000012EA                           490  
+000012EA  0C39 0000 002A6BCD       491      cmp.b #(FALSE),(BallMoved)
+000012F2  6700 000E                492      beq .DontDraw
+000012F6                           493  
+000012F6  4EB9 0000135E            494      jsr SetBallDrawParams
+000012FC  4EB9 00001394            495      jsr DrawPic
+00001302                           496  
+00001302                           497  .DontDraw:
+00001302  4E75                     498      rts
+00001304                           499  
+00001304                           500  
+00001304                           501  SetFirstDrawParams:
+00001304                           502  
+00001304  41F9 00001754            503      lea BackgroundBitmap, a0
+0000130A                           504  
+0000130A                           505      ;set draw start position to 0,0    
+0000130A  223C 00000320            506      move.l  #(OUTPUT_WINDOW_HEIGHT),d1  ;y
+00001310  4841                     507      swap    d1
+00001312  323C 0000                508      move.w  #0,d1                       ;x
+00001316                           509      
+00001316                           510      ;set chunk start position to 0,0    
+00001316  7400                     511      move.l  #0,d2                       ;y
+00001318  4842                     512      swap    d2
+0000131A  343C 0000                513      move.w  #0,d2                       ;x
+0000131E                           514      
+0000131E                           515      ;set chunk width and height to the screen resol
+0000131E  263C 0000042F            516      move.l  #(OUTPUT_WINDOW_WIDTH),d3
+00001324  4843                     517      swap    d3
+00001326  363C 0320                518      move.w  #(OUTPUT_WINDOW_HEIGHT),d3
+0000132A                           519      
+0000132A  4E75                     520      rts
+0000132C                           521  
+0000132C                           522  SetBgDrawParams:
+0000132C                           523  
+0000132C  41F9 00001754            524      lea BackgroundBitmap, a0
+00001332                           525  
+00001332                           526      ;set draw start position   
+00001332  2239 002A6BD8            527      move.l  (BallYPosition),d1           
+00001338  0681 00000014            528      add.l   #(BALL_HEIGHT),d1               ;y
+0000133E  4841                     529      swap    d1
+00001340  D2B9 002A6BD0            530      add.l   (BallXPosition),d1              ;x
+00001346                           531      ;sub.l   #(BALL_OFFSET),d1
+00001346                           532      
+00001346                           533      ;set chunk start position
+00001346  2439 002A6BD8            534      move.l  (BallYPosition),d2              ;y          
+0000134C  4842                     535      swap    d2
+0000134E  D4B9 002A6BD0            536      add.l  (BallXPosition),d2              ;x
+00001354                           537      
+00001354                           538      ;set chunk width and height
+00001354  7614                     539      move.l  #(BALL_WIDTH),d3                ;add offset maybe
+00001356  4843                     540      swap    d3
+00001358  363C 0014                541      move.w  #(BALL_HEIGHT),d3               ;add offset maybe
+0000135C                           542      
+0000135C  4E75                     543      rts
+0000135E                           544  
+0000135E                           545  SetBallDrawParams:
+0000135E                           546  
+0000135E  41F9 0027598C            547      lea BallBitmap, a0
+00001364                           548  
+00001364                           549      ;set draw start position   
+00001364  7214                     550      move.l  #(BALL_HEIGHT),d1
+00001366  2E39 002A6BDC            551      move.l  (BallYPositionFixed),d7
+0000136C  E08F                     552      lsr.l   #(FRACTION_BITS),d7
+0000136E  D287                     553      add.l   d7,d1
+00001370                           554      ;update the y position
+00001370  23C7 002A6BD8            555      move.l  d7, (BallYPosition)
+00001376                           556            
+00001376  4841                     557      swap    d1
+00001378                           558  
+00001378  2E39 002A6BD4            559      move.l  (BallXPositionFixed),d7
+0000137E  E08F                     560      lsr.l   #(FRACTION_BITS),d7
+00001380  3207                     561      move.w  d7, d1
+00001382                           562      ;update the x position
+00001382  23C7 002A6BD0            563      move.l  d7, (BallXPosition)
+00001388                           564  
+00001388                           565      
+00001388                           566      ;set chunk start position
+00001388  7400                     567      move.l  #0,d2 
+0000138A                           568      
+0000138A                           569      ;set chunk width and height
+0000138A  7614                     570      move.l  #(BALL_WIDTH),d3
+0000138C  4843                     571      swap    d3
+0000138E  363C 0014                572      move.w  #(BALL_HEIGHT),d3
+00001392                           573      
+00001392  4E75                     574      rts
+00001394                           575  
+00001394                           576       
+00001394                           577  DrawPic:
+00001394                           578      ;push the first pixel pos
+00001394  2C48                     579      move.l  a0, a6
+00001396  4EB9 00001484            580      jsr GetFirstPixelAddress
+0000139C  2F0E                     581      move.l  a6, -(sp)                               
+0000139E                           582      
+0000139E                           583      ;push image width
+0000139E  2C48                     584      move.l  a0, a6
+000013A0  4EB9 0000149C            585      jsr GetImageWidth
+000013A6  2F00                     586      move.l  d0,-(sp)
+000013A8                           587      
+000013A8                           588      ;push image height
+000013A8  2C48                     589      move.l  a0, a6
+000013AA  4EB9 000014AC            590      jsr GetImageHeight
+000013B0  2F00                     591      move.l  d0,-(sp)
+000013B2                           592  
+000013B2                           593      ;push the draw start pos
+000013B2  4284                     594      clr.l   d4
+000013B4  3801                     595      move.w  d1, d4
+000013B6  2F04                     596      move.l  d4,-(sp)    ;push x
+000013B8  4841                     597      swap    d1
+000013BA  3801                     598      move.w  d1,d4
+000013BC  2F04                     599      move.l  d4,-(sp)    ;push y
+000013BE                           600      
+000013BE                           601      ;push the chunk start pos
+000013BE  3802                     602      move.w  d2,d4
+000013C0  2F04                     603      move.l  d4,-(sp)    ;push x
+000013C2                           604      ;convert the y pos of chunk to bitmap coor
+000013C2  4842                     605      swap    d2
+000013C4  3802                     606      move.w  d2,d4
+000013C6  D843                     607      add.w   d3,d4           ;add chunk height
+000013C8                           608      ;d0 have the image height
+000013C8  2200                     609      move.l  d0,d1 
+000013CA  9284                     610      sub.l   d4,d1
+000013CC  2F01                     611      move.l  d1, -(sp)   ;push y
+000013CE                           612      
+000013CE                           613      ;push the chunk dimensions
+000013CE  4843                     614      swap    d3
+000013D0  3803                     615      move.w  d3, d4  
+000013D2  2F04                     616      move.l  d4,-(sp)    ;push width
+000013D4  4843                     617      swap    d3
+000013D6  3803                     618      move.w  d3, d4
+000013D8  2F04                     619      move.l  d4,-(sp)    ;push height
+000013DA                           620   
+000013DA  4EB9 000013E8            621      jsr DrawAChunk
+000013E0                           622      
+000013E0                           623      ;reinit the stack pointer
+000013E0  DFFC 00000028            624      add.l   #(STACK_OFFSET_WHEN_DRAWING),sp
+000013E6  4E75                     625      rts                
+000013E8                           626      
+000013E8                           627  DrawAChunk:
+000013E8                           628      
+000013E8  2E2F 0020                629      move.l  IMAGE_WIDTH_STACK_OFFSET(sp),d7                 ;get the image width into d7
+000013EC  0287 00000003            630      andi.l  #3,d7                                           ;get the rest of division by 4, which is the padding     
+000013F2                           631      
+000013F2  286F 0024                632      move.l  FIRST_PIXEL_ADDRESS_STACK_OFFSET(sp),a4         ;a4 points to the first pixel
+000013F6                           633      
+000013F6  222F 0020                634      move.l  IMAGE_WIDTH_STACK_OFFSET(sp),d1                 ;image width into d1
+000013FA  2401                     635      move.l  d1, d2                                          ;temp value to avoid mul
+000013FC  D282                     636      add.l   d2, d1
+000013FE  D282                     637      add.l   d2, d1                                          ;get the width number of bytes
+00001400  DE81                     638      add.l   d1,d7                                           ;width bytes
+00001402                           639      
+00001402  2407                     640      move.l  d7, d2                                          ;store width bytes into d2
+00001404                           641      
+00001404  222F 000C                642      move.l  CHUNK_Y_POS_STACK_OFFSET(sp),d1                 ;get the chunk y pos
+00001408  C4C1                     643      mulu.w  d1,d2                                           ;mutiply the y with the width bytes to get the y bytes offset
+0000140A                           644      
+0000140A  202F 0010                645      move.l  CHUNK_X_POS_STACK_OFFSET(sp),d0                 ;put chunk x start pos into d0
+0000140E  2200                     646      move.l  d0, d1                                          ;temp value to avoid mul
+00001410  D081                     647      add.l   d1, d0
+00001412  D081                     648      add.l   d1, d0                                          ;get the x number of bytes
+00001414                           649      
+00001414  D480                     650      add.l   d0,d2                                           ;add the x bytes to the y bytes offset to have the total offset
+00001416                           651      
+00001416  D9C2                     652      add.l   d2, a4                                          ;add the offset to get the new first position
+00001418                           653      
+00001418  7A00                     654      move.l  #0, d5                                          ;x counter
+0000141A  7C00                     655      move.l  #0, d6                                          ;y counter
+0000141C                           656      
+0000141C                           657      
+0000141C                           658  DrawColumn:
+0000141C                           659      ;set pen color
+0000141C  4281                     660      clr.l d1
+0000141E  121C                     661      move.b   (a4)+,d1                                       ;set blue
+00001420  E189                     662      lsl.l   #8,d1                                           ;shift the byte to the left
+00001422  121C                     663      move.b  (a4)+,d1                                        ;set green
+00001424  E189                     664      lsl.l   #8,d1                                           ;shift the byte to the left
+00001426  121C                     665      move.b  (a4)+,d1                                        ;set red    => d1 has 00BBGGRR
+00001428                           666      
+00001428                           667      ;if green, skip that pixel
+00001428  B2BC 0000FF00            668      cmp.l   #(GREEN),d1
+0000142E  6700 0018                669      beq     NextPixel
+00001432                           670      
+00001432  7050                     671      move.l  #SET_PEN_COLOR_COMMAND, d0
+00001434  4E4F                     672      Trap #15
+00001436                           673      
+00001436                           674      ;draw a pixel
+00001436                           675      ;set x in d1 and y in d2
+00001436  4281                     676      clr.l   d1
+00001438  222F 0018                677      move.l  DRAW_X_POS_STACK_OFFSET(sp),d1                                               
+0000143C  D285                     678      add.l   d5,d1                                           ;set x position on screen
+0000143E                           679      
+0000143E  242F 0014                680      move.l  DRAW_Y_POS_STACK_OFFSET(sp),d2
+00001442  9486                     681      sub.l   d6,d2                                           ;set the y position on screen
+00001444                           682      
+00001444  7052                     683      move.l  #DRAW_A_PIXEL_COMMAND, d0
+00001446  4E4F                     684      Trap #15
+00001448                           685  
+00001448                           686  NextPixel:    
+00001448  5285                     687      addi.l  #1, d5                                          ;increment x counter
+0000144A  202F 0008                688      move.l  CHUNK_WIDTH_STACK_OFFSET(sp),d0
+0000144E  BA80                     689      cmp.l  d0,d5
+00001450  66CA                     690      bne DrawColumn                                          ;if not done with the column, continue drawing
+00001452                           691      
+00001452  5286                     692      addi.l  #1, d6                                          ;increment y counter
+00001454  202F 0004                693      move.l  CHUNK_HEIGHT_STACK_OFFSET(sp),d0
+00001458  BC80                     694      cmp.l   d0,d6
+0000145A  6700 0018                695      beq     DrawEnd                                         ;if done with the rows, then stop drawing
+0000145E                           696      
+0000145E  7A00                     697      move.l  #0, d5                                          ;reset x counter
+00001460  222F 0008                698      move.l  CHUNK_WIDTH_STACK_OFFSET(sp),d1                 ;put chunk width in d1
+00001464  2001                     699      move.l  d1, d0                                          ;d0 has the temp to avoid mul
+00001466  D280                     700      add.l   d0, d1
+00001468  D280                     701      add.l   d0, d1                                          ;multiply it by 3 to get the bytes number
+0000146A                           702      
+0000146A  2007                     703      move.l  d7, d0                                          ;d0 = width bytes
+0000146C  9081                     704      sub.l   d1,d0                                           ;sub the chunk bytes from the width bytes
+0000146E  D9C0                     705      add.l   d0, a4                                          ;and then add it to a4 to get the next pixel
+00001470                           706      
+00001470  4EF8 141C                707      jmp DrawColumn                                          ;draw next column
+00001474                           708  
+00001474                           709  DrawEnd:
+00001474                           710  
+00001474  4E75                     711      rts
+00001476                           712  
+00001476                           713  
+00001476                           714  EnableDoubleBuffer:
+00001476                           715      ;double buffering mode enabled
+00001476  705C                     716      move.l  #SET_DRAWING_MODE_COMMAND, d0
+00001478  7211                     717      move.l  #DOUBLE_BUFFERING_MODE, d1
+0000147A  4E4F                     718      Trap    #15
+0000147C                           719  
+0000147C  4E75                     720      rts
+0000147E                           721  
+0000147E                           722  PaintScreenBuffer:
+0000147E                           723      ;repaint screen from buffer
+0000147E  705E                     724      move.l  #REPAINT_SCREEN_COMMAND, d0
+00001480  4E4F                     725      Trap    #15
+00001482                           726          
+00001482  4E75                     727      rts    
+00001484                           728  
+00001484                           729  ;param a6:image address
+00001484                           730  GetFirstPixelAddress:
+00001484  DDFC 0000000A            731      add.l   #(OFFSET_TO_PIXEL_ARRAY),a6                     ;a6 has the pixel offset address
+0000148A  2016                     732      move.l  (a6),d0                                         ;put it in d0
+0000148C  4EB9 000014BC            733      jsr SwapBytes                                           ;swap to get the right value
+00001492  DDC0                     734      add.l   d0,a6                                           ;a6 has the 0, h-1 pixel address
+00001494  9DFC 0000000A            735      sub.l   #(OFFSET_TO_PIXEL_ARRAY),a6
+0000149A                           736      
+0000149A  4E75                     737      rts
+0000149C                           738  
+0000149C                           739  ;param a6:imaage address, return d0: image width
+0000149C                           740  
+0000149C                           741  GetImageWidth:
+0000149C  DDFC 00000012            742      add.l   #(OFFSET_IMAGE_WIDTH),a6                        ;a6 has the image width address
+000014A2  2016                     743      move.l  (a6),d0                                         ;put it in d0
+000014A4  4EB9 000014BC            744      jsr SwapBytes                                           ;swap to get the right value
+000014AA                           745      
+000014AA  4E75                     746      rts
+000014AC                           747  
+000014AC                           748  ;param a6:imaage address, return d0: image height
+000014AC                           749  GetImageHeight:
+000014AC  DDFC 00000016            750      add.l   #(OFFSET_IMAGE_HEIGHT),a6                       ;a6 has the image width address
+000014B2  2016                     751      move.l  (a6),d0                                         ;put it in d0
+000014B4  4EB9 000014BC            752      jsr SwapBytes                                           ;swap to get the right value
+000014BA                           753  
+000014BA  4E75                     754      rts
+000014BC                           755  
+000014BC                           756  
+000014BC                           757  SwapBytes:
+000014BC                           758      ;DDCCBBAA
+000014BC  E158                     759      rol.w   #8,d0   ;DDCCAABB
+000014BE  4840                     760      swap.w    d0    ;AABBDDCC
+000014C0  E158                     761      rol.w   #8,d0   ;AABBCCDD
+000014C2                           762      
+000014C2  4E75                     763      rts
+000014C4                           764  
+000014C4                           765  
+000014C4                           766          
+000014C4                           767  
+000014C4                           768  
+000014C4                           769  
+000014C4                           770  
+000014C4                           771  
+000014C4                           772  
+000014C4                           773  
+000014C4                           774  
+000014C4                           775  
+000014C4                           776  
+000014C4                           777  -------------------- end include --------------------
+000014C4                           778      include "CollisionModule.x68"
+000014C4                           779  ;Collision related logic
+000014C4                           780  
+000014C4                           781  CheckWallCollision:
+000014C4                           782  
+000014C4                           783      ;check if in bounds
+000014C4  0CB9 00000139 002A6BD0   784      cmp.l   #(TOP_LEFT_BOARD_X_POS), (BallXPosition)
+000014CE  6F00 0018                785      ble     .Collided
+000014D2                           786  
+000014D2  0CB9 000002E1 002A6BD0   787      cmp.l   #(BOTTOM_RIGHT_BOARD_X_POS-BALL_WIDTH), (BallXPosition)
+000014DC  6C00 000A                788      bge     .Collided
+000014E0                           789  
+000014E0  7000                     790      move.l  #(FALSE),d0
+000014E2                           791  
+000014E2  4EF9 000014EA            792      jmp .EndCheck
+000014E8                           793  
+000014E8                           794  .Collided:
+000014E8                           795  
+000014E8  7001                     796      move.l  #(TRUE), d0
+000014EA                           797  
+000014EA                           798  .EndCheck:
+000014EA                           799  
+000014EA  4E75                     800      rts
+000014EC                           801  
+000014EC                           802  
+000014EC                           803  CheckPegCollision:
+000014EC                           804      
+000014EC                           805      ;movem.l    ALL_REG, -(sp)
+000014EC                           806      ;set params
+000014EC  2039 002A6BD0            807      move.l  (BallXPosition), d0
+000014F2  0680 0000000A            808      add.l   #(BALL_RADIUS), d0  ;shift to center
+000014F8  2239 002A6BD8            809      move.l  (BallYPosition), d1
+000014FE  0681 0000000A            810      add.l   #(BALL_RADIUS), d1  ;shift to center
+00001504                           811  
+00001504  242F 0008                812      move.l  CURRENT_PEG_X_STACK_OFFSET(sp),d2
+00001508  262F 0004                813      move.l  CURRENT_PEG_Y_STACK_OFFSET(sp),d3
+0000150C                           814  
+0000150C                           815      ;check if we even should do collision check
+0000150C                           816      ;dy is first
+0000150C  B681                     817      cmp.l   d1,d3 
+0000150E  6C00 000C                818      bge     .SubBallYPegY ; if peg y bigger
+00001512                           819      
+00001512  9283                     820      sub.l   d3,d1
+00001514  2A01                     821      move.l  d1,d5               ;dy
+00001516  4EF9 00001520            822      jmp     .CheckDy
+0000151C                           823  
+0000151C                           824  .SubBallYPegY:
+0000151C                           825  
+0000151C  9681                     826      sub.l   d1,d3
+0000151E  2A03                     827      move.l  d3, d5              ;dy
+00001520                           828  
+00001520                           829  .CheckDy:
+00001520                           830  
+00001520  BABC 00000011            831      cmp.l   #(MIN_DY_TO_CHECK_COLLISION), d5
+00001526  6E00 005E                832      bgt     .DidntCollide
+0000152A                           833  
+0000152A                           834      ;dx is second
+0000152A  B480                     835      cmp.l   d0,d2 
+0000152C  6C00 000C                836      bge     .SubBallXPegX ; if peg x bigger
+00001530                           837      
+00001530  9082                     838      sub.l   d2,d0
+00001532  2800                     839      move.l  d0,d4               ;dx
+00001534  4EF9 0000153E            840      jmp     .CheckDx
+0000153A                           841  
+0000153A                           842  .SubBallXPegX:
+0000153A                           843  
+0000153A  9480                     844      sub.l   d0,d2
+0000153C  2802                     845      move.l  d2, d4              ;dx
+0000153E                           846  
+0000153E                           847  .CheckDx:
+0000153E                           848  
+0000153E  B8BC 00000011            849      cmp.l   #(MIN_DX_TO_CHECK_COLLISION), d4
+00001544  6E00 0040                850      bgt     .DidntCollide
+00001548                           851  
+00001548                           852      ;store the closest peg coor
+00001548  23EF 0008 002A6EB8       853      move.l  CURRENT_PEG_X_STACK_OFFSET(sp),(ClosestPegX)
+00001550  23EF 0004 002A6EBC       854      move.l  CURRENT_PEG_Y_STACK_OFFSET(sp),(ClosestPegY)
+00001558                           855  
+00001558                           856      ;if we're here. we check for collision
+00001558  2004                     857      move.l  d4,d0   ;dx
+0000155A  C0C4                     858      mulu.w  d4,d0   ;d0 = dx^2
+0000155C  2205                     859      move.l  d5,d1   ;dy
+0000155E  C2C5                     860      mulu.w  d5,d1   ;d1 = dy^2
+00001560                           861  
+00001560  D280                     862      add.l   d0, d1  ;d1 = dx^2 + dy^2
+00001562  E589                     863      lsl.l   #2, d1  
+00001564  4DF9 00275E74            864      lea     (Sqrts), a6
+0000156A                           865  
+0000156A  2036 1000                866      move.l  (a6, d1), d0    ;d0 = sqrt(dx^2 + dy^2) with no byte swap
+0000156E                           867      
+0000156E  4EB8 14BC                868      jsr     SwapBytes       ;d0 bytes are swapped, so it has the correct sqrt
+00001572                           869  
+00001572  E088                     870      lsr.l   #(FRACTION_BITS),d0
+00001574                           871  
+00001574                           872      ;combine radiuses
+00001574  720A                     873      move.l  #(BALL_RADIUS), d1
+00001576  5A81                     874      add.l   #(PEG_RADIUS), d1
+00001578                           875  
+00001578  B081                     876      cmp.l   d1, d0
+0000157A  6E00 000A                877      bgt     .DidntCollide
+0000157E                           878  
+0000157E  7001                     879      move.l  #(TRUE), d0
+00001580                           880  
+00001580  4EF9 00001588            881      jmp     .CheckEnd
+00001586                           882  
+00001586                           883  
+00001586                           884  .DidntCollide:
+00001586                           885  
+00001586  7000                     886      move.l  #(FALSE), d0
+00001588                           887  
+00001588                           888  .CheckEnd:
+00001588                           889      ;movem.l    (sp)+, ALL_REG
+00001588                           890  
+00001588  4E75                     891      rts
+0000158A                           892  
+0000158A                           893  
+0000158A                           894  BounceBallOffWall:
+0000158A                           895      
+0000158A                           896  
+0000158A  2039 002A6BE0            897      move.l  (BallXVelocity), d0
+00001590                           898      ;muls.w     #(HALF), d0     
+00001590                           899      ;asr.l   #(FRACTION_BITS),d0        ;soften collision
+00001590                           900  
+00001590  4480                     901      neg.l   d0
+00001592  23C0 002A6BE0            902      move.l  d0, (BallXVelocity)
+00001598                           903  
+00001598  4E75                     904      rts
+0000159A                           905  
+0000159A                           906  
+0000159A                           907  
+0000159A                           908  BounceBallOffPeg:
+0000159A                           909  
+0000159A                           910      ;set tangent vect
+0000159A  2039 002A6EBC            911      move.l  (ClosestPegY),d0
+000015A0  90B9 002A6BD8            912      sub.l   (BallYPosition), d0     
+000015A6  0680 0000000A            913      add.l   #(BALL_RADIUS), d0      ;d0 = tgX = Ypeg - Yball
+000015AC  2239 002A6BD0            914      move.l  (BallXPosition), d1
+000015B2  0681 0000000A            915      add.l   #(BALL_RADIUS), d1      
+000015B8  92B9 002A6EB8            916      sub.l   (ClosestPegX), d1       ;d1 = tgY = Xball - Xpeg
+000015BE                           917  
+000015BE                           918  
+000015BE                           919      ;get vect length
+000015BE  2C00                     920      move.l  d0, d6
+000015C0  2E01                     921      move.l  d1, d7
+000015C2                           922  
+000015C2  CDC0                     923      muls.w  d0, d6                  ;d6 = tgX ^ 2
+000015C4  CFC1                     924      muls.w  d1, d7                  ;d7 = tgY ^ 2
+000015C6                           925  
+000015C6  DE86                     926      add.l   d6, d7                  ;d7 = tgX ^ 2 + tgY ^ 2
+000015C8                           927  
+000015C8  E58F                     928      lsl.l   #2, d7  
+000015CA  4DF9 00275E74            929      lea     (Sqrts), a6
+000015D0                           930  
+000015D0  2436 7000                931      move.l  (a6, d7), d2            ;d2 = TgMag = sqrt(tgX ^ 2 + tgY ^ 2) with no byte swap
+000015D4                           932  
+000015D4  2E00                     933      move.l  d0, d7                  ;store tgX
+000015D6  2002                     934      move.l  d2, d0
+000015D8                           935      
+000015D8  4EB8 14BC                936      jsr     SwapBytes               
+000015DC  E088                     937      lsr.l   #(FRACTION_BITS),d0
+000015DE                           938  
+000015DE  2400                     939      move.l  d0, d2                  ;d2 bytes are swapped, so it has the correct sqrt
+000015E0  2007                     940      move.l  d7, d0                  ;restore d0
+000015E2                           941  
+000015E2  B4BC 00000000            942      cmp.l   #0, d2
+000015E8  6600 0004                943      bne     .NotZeroSqrt
+000015EC                           944  
+000015EC                           945      ; to avoid div by 0
+000015EC  7401                     946      move.l  #1, d2
+000015EE                           947  
+000015EE                           948  
+000015EE                           949  .NotZeroSqrt:   
+000015EE                           950  
+000015EE                           951      ;get normalized tangent
+000015EE  81C2                     952      divs.w  d2, d0                  ;Xtg
+000015F0  4840                     953      swap    d0
+000015F2  4240                     954      clr.w   d0
+000015F4  4840                     955      swap    d0
+000015F6  83C2                     956      divs.w  d2, d1                  ;Ytg
+000015F8  4841                     957      swap    d1
+000015FA  4241                     958      clr.w   d1
+000015FC  4841                     959      swap    d1
+000015FE                           960  
+000015FE                           961  
+000015FE                           962      ;get length by calculating the dot product
+000015FE                           963      ;copy x and y
+000015FE  2400                     964      move.l  d0, d2                  ;Xtg
+00001600  2601                     965      move.l  d1, d3                  ;Ytg
+00001602                           966  
+00001602                           967      ;get velocity
+00001602  2C39 002A6BE0            968      move.l  (BallXVelocity), d6
+00001608  2E39 002A6BE4            969      move.l  (BallYVelocity), d7
+0000160E                           970      ; dot product
+0000160E  C5C6                     971      muls.w  d6, d2                  
+00001610  C7C7                     972      muls.w  d7, d3
+00001612                           973  
+00001612  E082                     974      asr.l   #(FRACTION_BITS),d2
+00001614  E083                     975      asr.l   #(FRACTION_BITS),d3
+00001616                           976  
+00001616                           977  
+00001616  D682                     978      add.l   d2, d3                  
+00001618  2803                     979      move.l  d3, d4                  ;d4 = length
+0000161A                           980  
+0000161A                           981      ;get the velocity comp parallel to the tg
+0000161A                           982      ;copy x and y of tg
+0000161A  2400                     983      move.l  d0, d2                  ;Xtg
+0000161C  2601                     984      move.l  d1, d3                  ;Ytg
+0000161E                           985  
+0000161E  C5C4                     986      muls.w  d4, d2                  ;d2 = Xparal = length * Xtg
+00001620  C7C4                     987      muls.w  d4, d3                  ;d3 = Yparal = length * Ytg
+00001622                           988  
+00001622                           989      ;get velocity
+00001622  2039 002A6BE0            990      move.l  (BallXVelocity), d0     ;Xvel
+00001628  2239 002A6BE4            991      move.l  (BallYVelocity), d1     ;Yvel
+0000162E                           992  
+0000162E                           993      ;get the velocity comp perpendicular to the tg
+0000162E  9082                     994      sub.l   d2, d0                  ;d0 = Xper = Xvel - Xparal
+00001630  9283                     995      sub.l   d3, d1                  ;d1 = Yper = Yvel - Yparal
+00001632                           996  
+00001632                           997      ;get the new velocity
+00001632  E580                     998      asl.l   #2, d0  
+00001634  E581                     999      asl.l   #2, d1
+00001636                          1000  
+00001636  2439 002A6BE0           1001      move.l  (BallXVelocity), d2     ;Xvel
+0000163C  2639 002A6BE4           1002      move.l  (BallYVelocity), d3     ;Yvel
+00001642                          1003          
+00001642  9480                    1004      sub.l   d0, d2                  ;d2 = NewXvel = Xvel - 2 * Xper
+00001644  9681                    1005      sub.l   d1, d3                  ;d3 = NewYvel = Yvel - 2 * Yper
+00001646                          1006  
+00001646  C7FC 0011               1007      muls.w  #(Y_VELOCITY_SOFTNER), d3
+0000164A  E083                    1008      asr.l   #(FRACTION_BITS),d3         ;soften y velocity
+0000164C                          1009  
+0000164C                          1010      ;get the abs to test on it
+0000164C  2202                    1011      move.l  d2, d1
+0000164E                          1012  
+0000164E  4EB9 00001728           1013      jsr     GetAbsoluteValue            ;abs will be in d0
+00001654                          1014  
+00001654  B0BC 00000150           1015      cmp.l   #(MIN_RAND_X_VEL_ALLOWED),d0        
+0000165A  6D00 000E               1016      blt     .NoXSoftening
+0000165E                          1017  
+0000165E  C5FC 0040               1018      muls.w  #(X_VELOCITY_SOFTNER), d2   ;soften x velocity
+00001662  E082                    1019      asr.l   #(FRACTION_BITS),d2 
+00001664                          1020  
+00001664  4EF9 00001672           1021      jmp     .NoRandVelX
+0000166A                          1022  
+0000166A                          1023  
+0000166A                          1024  .NoXSoftening:
+0000166A                          1025  
+0000166A  4EB9 00001680           1026      jsr     GetRandomXVel
+00001670                          1027  
+00001670  2400                    1028      move.l  d0, d2
+00001672                          1029  
+00001672                          1030  
+00001672                          1031  .NoRandVelX:
+00001672                          1032      ;update the velocity
+00001672  23C2 002A6BE0           1033      move.l  d2, (BallXVelocity)
+00001678  23C3 002A6BE4           1034      move.l  d3, (BallYVelocity)
+0000167E                          1035  
+0000167E                          1036  
+0000167E  4E75                    1037      rts 
+00001680                          1038  
+00001680                          1039  
+00001680                          1040  GetRandomXVel:
+00001680                          1041                              
+00001680  48E7 4000               1042      movem.l d1,-(sp)
+00001684                          1043  
+00001684  4EB9 000016EC           1044      jsr GetRandomNumber
+0000168A                          1045  
+0000168A  C0BC 00000199           1046      and.l   #(MAX_RAND_X_VELOCITY), d0
+00001690  0680 00000100           1047      add.l   #(MIN_RAND_X_VELOCITY), d0  ;between min and max
+00001696                          1048  
+00001696                          1049      ;on first drop
+00001696  0CB9 00000000 002A6BCC  1050      cmp.l   #(FALSE), (BallDropped)
+000016A0  6700 0020               1051      beq     .RandFirstXVel
+000016A4                          1052  
+000016A4                          1053      ;decide if negative or positive based on the ball x position compared to peg
+000016A4  2239 002A6BD0           1054      move.l  (BallXPosition), d1
+000016AA  92B9 002A6EB8           1055      sub.l   (ClosestPegX), d1
+000016B0                          1056  
+000016B0  B2BC 00000000           1057      cmp.l   #0, d1
+000016B6  6C00 002E               1058      bge     .EndRand
+000016BA                          1059      ;go right else go left
+000016BA                          1060  
+000016BA  4480                    1061      neg.l   d0
+000016BC                          1062  
+000016BC  4EF9 000016E6           1063      jmp     .EndRand
+000016C2                          1064  
+000016C2                          1065  .RandFirstXVel:
+000016C2  2200                    1066      move.l  d0, d1          ;store rand
+000016C4                          1067  
+000016C4  4EB9 000016EC           1068      jsr GetRandomNumber     ; get new rand
+000016CA                          1069  
+000016CA  C0BC 00000001           1070      and.l   #1, d0
+000016D0                          1071  
+000016D0  B0BC 00000000           1072      cmp.l   #0, d0
+000016D6  6600 000A               1073      bne     .MakeVelNegative    
+000016DA                          1074      ;go right
+000016DA  2001                    1075      move.l  d1, d0          ;restore pos rand
+000016DC                          1076  
+000016DC  4EF9 000016E6           1077      jmp     .EndRand
+000016E2                          1078  
+000016E2                          1079  .MakeVelNegative:           ;go left
+000016E2                          1080  
+000016E2  4481                    1081      neg.l   d1
+000016E4  2001                    1082      move.l  d1, d0          ;restore neg rand
+000016E6                          1083  
+000016E6                          1084  .EndRand:
+000016E6                          1085  
+000016E6  4CDF 0002               1086      movem.l (sp)+,d1
+000016EA                          1087  
+000016EA  4E75                    1088      rts
+000016EC                          1089  
+000016EC                          1090  
+000016EC                          1091  
+000016EC                          1092  
+000016EC                          1093  
+000016EC                          1094  
+000016EC                          1095  
+000016EC                          1096  -------------------- end include --------------------
+000016EC                          1097      include "RandomNumberGenerator.x68"
+000016EC                          1098  ;GET RANDOM NUmBER
+000016EC                          1099  
+000016EC                          1100  GetRandomNumber:
+000016EC  48E7 4000               1101      movem.l d1,-(sp)
+000016F0  48E7 2000               1102      movem.l d2,-(sp)
+000016F4                          1103      
+000016F4  2039 002A6EC8           1104      move.l  Rand,d0
+000016FA  72AF                    1105      moveq   #$AF-$100,d1
+000016FC  7412                    1106      moveq   #18,d2
+000016FE                          1107  .Ninc0  
+000016FE  D080                    1108      add.l   d0,d0
+00001700  6400 0004               1109      bcc .Ninc1
+00001704  B300                    1110      eor.b   d1,d0
+00001706                          1111  .Ninc1
+00001706  51CA FFF6               1112      dbf d2,.Ninc0
+0000170A                          1113      
+0000170A  23C0 002A6EC8           1114      move.l  d0,Rand
+00001710                          1115      
+00001710  4CDF 0004               1116      movem.l (sp)+,d2
+00001714  4CDF 0002               1117      movem.l (sp)+,d1
+00001718                          1118      
+00001718  4E75                    1119      rts
+0000171A                          1120  
+0000171A                          1121  SeedRandomNumber:
+0000171A                          1122      
+0000171A  103C 0008               1123      move.b  #GET_TIME_COMMAND,d0
+0000171E  4E4F                    1124      TRAP    #15
+00001720                          1125  
+00001720  23C1 002A6EC8           1126      move.l  d1,Rand
+00001726                          1127  
+00001726  4E75                    1128      rts
+00001726  4E75                    1129  -------------------- end include --------------------
+00001728                          1130      include "Math.x68"
+00001728                          1131  ;math
+00001728                          1132  
+00001728                          1133  ;param:d1, returns d0 as the abs
+00001728                          1134  GetAbsoluteValue:
+00001728                          1135  
+00001728  48E7 4000               1136      movem.l d1,-(sp)
+0000172C  48E7 0200               1137      movem.l d6,-(sp)
+00001730  48E7 0100               1138      movem.l d7,-(sp)
+00001734                          1139  
+00001734                          1140  
+00001734  2C01                    1141      move.l  d1, d6      ;y = x
+00001736  E086                    1142      asr.l   #8,d6   
+00001738  E086                    1143      asr.l   #8,d6   
+0000173A  E086                    1144      asr.l   #8,d6   
+0000173C  EE86                    1145      asr.l   #7,d6       ;y >>> 31
+0000173E                          1146  
+0000173E  2E06                    1147      move.l  d6, d7      ;store y
+00001740  B386                    1148      eor.l   d1, d6      ;x xor y
+00001742                          1149  
+00001742  9C87                    1150      sub.l   d7, d6      ;(x xor y) - y
+00001744                          1151  
+00001744  2006                    1152      move.l  d6, d0
+00001746                          1153  
+00001746  4CDF 0080               1154      movem.l (sp)+,d7
+0000174A  4CDF 0040               1155      movem.l (sp)+,d6
+0000174E  4CDF 0002               1156      movem.l (sp)+,d1
+00001752                          1157  
+00001752                          1158  
+00001752  4E75                    1159      rts
+00001752  4E75                    1160  -------------------- end include --------------------
+00001754                          1161  
+00001754                          1162  
+00001754                          1163  
+00001754                          1164  ;bitmaps
+00001754                          1165  BackgroundBitmap    INCBIN "bg.bmp"
+0027598C                          1166  BallBitmap          INCBIN "ironBall.bmp"
+00275E74                          1167  
+00275E74                          1168  ;sqrts
+00275E74                          1169  Sqrts               INCBIN  "Sqrts.bin" 
+002A6BB4                          1170  
+002A6BB4                          1171  ;input
+002A6BB4= 00000000                1172  PlayerInput         dc.l    0 ;nothing
+002A6BB8                          1173  
+002A6BB8                          1174  ;frame rate
+002A6BB8= 00000000                1175  FrameBeginTime      dc.l    0
+002A6BBC                          1176  
+002A6BBC                          1177  ;ball variables
+002A6BBC= 0000109C 0000109E ...   1178  BallCalls           dc.l    EndBallUpdate, DropBall, MoveBallToLeft, MoveBallToRight
+002A6BCC= 00                      1179  BallDropped         dc.b    (FALSE)
+002A6BCD= 00                      1180  BallMoved           dc.b    (FALSE)
+002A6BCE= 00                      1181  BallJustCollided    dc.b    (FALSE)
+002A6BD0= 00000139                1182  BallXPosition       dc.l    (BALL_INITIAL_X_POS)     
+002A6BD4= 00013900                1183  BallXPositionFixed  dc.l    (BALL_INITIAL_X_POS<<FRACTION_BITS)
+002A6BD8= 0000002A                1184  BallYPosition       dc.l    (BALL_INITIAL_Y_POS)     
+002A6BDC= 00002A00                1185  BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
+002A6BE0= 00000000                1186  BallXVelocity       dc.l    (BALL_INIT_X_VELOCITY)
+002A6BE4= 00000000                1187  BallYVelocity       dc.l    (BALL_INIT_Y_VELOCITY)
+002A6BE8                          1188  
+002A6BE8                          1189  PegsXs              ;dc.l   356, 407, 458, 509, 560, 612, 663, 714          
+002A6BE8= 00000180 000001B3 ...   1190                      dc.l    384, 435, 486, 538, 589, 640, 691
+002A6C04= 00000164 00000197 ...   1191                      dc.l    356, 407, 458, 509, 560, 612, 663, 714
+002A6C24= 00000180 000001B3 ...   1192                      dc.l    384, 435, 486, 538, 589, 640, 691
+002A6C40= 00000164 00000197 ...   1193                      dc.l    356, 407, 458, 509, 560, 612, 663, 714
+002A6C60= 00000180 000001B3 ...   1194                      dc.l    384, 435, 486, 538, 589, 640, 691
+002A6C7C= 00000164 00000197 ...   1195                      dc.l    356, 407, 458, 509, 560, 612, 663, 714
+002A6C9C= 00000180 000001B3 ...   1196                      dc.l    384, 435, 486, 538, 589, 640, 691
+002A6CB8= 00000164 00000197 ...   1197                      dc.l    356, 407, 458, 509, 560, 612, 663, 714
+002A6CD8= 00000180 000001B3 ...   1198                      dc.l    384, 435, 486, 538, 589, 640, 691
+002A6CF4= 00000164 00000197 ...   1199                      dc.l    356, 407, 458, 509, 560, 612, 663, 714
+002A6D14= 00000180 000001B3 ...   1200                      dc.l    384, 435, 486, 538, 589, 640, 691
+002A6D30= 00000164 00000197 ...   1201                      dc.l    356, 407, 458, 509, 560, 612, 663, 714          ; for the lower part of the board
+002A6D50                          1202  
+002A6D50                          1203  
+002A6D50                          1204  PegsYs              ;dc.l   84, 84, 84, 84, 84, 84, 84, 84
+002A6D50= 00000081 00000081 ...   1205                      dc.l    129, 129, 129, 129, 129, 129, 129
+002A6D6C= 000000AE 000000AE ...   1206                      dc.l    174, 174, 174, 174, 174, 174, 174, 174
+002A6D8C= 000000DB 000000DB ...   1207                      dc.l    219, 219, 219, 219, 219, 219, 219
+002A6DA8= 00000108 00000108 ...   1208                      dc.l    264, 264, 264, 264, 264, 264, 264, 264
+002A6DC8= 00000135 00000135 ...   1209                      dc.l    309, 309, 309, 309, 309, 309, 309
+002A6DE4= 00000162 00000162 ...   1210                      dc.l    354, 354, 354, 354, 354, 354, 354, 354
+002A6E04= 0000018F 0000018F ...   1211                      dc.l    399, 399, 399, 399, 399, 399, 399
+002A6E20= 000001BC 000001BC ...   1212                      dc.l    444, 444, 444, 444, 444, 444, 444, 444
+002A6E40= 000001E9 000001E9 ...   1213                      dc.l    489, 489, 489, 489, 489, 489, 489
+002A6E5C= 00000216 00000216 ...   1214                      dc.l    534, 534, 534, 534, 534, 534, 534, 534
+002A6E7C= 00000244 00000244 ...   1215                      dc.l    580, 580, 580, 580, 580, 580, 580
+002A6E98= 0000028D 0000028D ...   1216                      dc.l    653, 653, 653, 653, 653, 653, 653, 653          ; for the lower part of the board           
+002A6EB8                          1217  
+002A6EB8= 00000000                1218  ClosestPegX         dc.l    0
+002A6EBC= 00000000                1219  ClosestPegY         dc.l    0
+002A6EC0= 00000168                1220  NumberOfPegs        dc.l    (PegsYs-PegsXs)
+002A6EC4= 00000000                1221  LoopCounter         dc.l    0
+002A6EC8                          1222  
+002A6EC8                          1223  Rand                ds.l    1
+002A6ECC                          1224  
+002A6ECC                          1225      END    START
 
 No errors detected
 No warnings generated
@@ -1037,11 +1236,11 @@ SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
 ALL_REG             7FFF
-BACKGROUNDBITMAP    163E
-BALLBITMAP          275874
-BALLCALLS           2A70BC
-BALLDROPPED         2A70CC
-BALLDROPPING        1100
+BACKGROUNDBITMAP    1754
+BALLBITMAP          27598C
+BALLCALLS           2A6BBC
+BALLDROPPED         2A6BCC
+BALLDROPPING        1106
 BALLDROPPING:CONTINUEBALLUPDATE  11B8
 BALLDROPPING:DONTMOVE  1200
 BALLDROPPING:ENDPEGLOOP  1170
@@ -1051,132 +1250,155 @@ BALLDROPPING:MOVEONTOPEGS  1122
 BALLDROPPING:NEXTPEG  1134
 BALLDROPPING:NOTCOLLIDING  1182
 BALLDROPPING:SKIPBOUNCEOFFPEG  11B8
-BALLJUSTCOLLIDED    2A70CE
-BALLMOVED           2A70CD
-BALLXPOSITION       2A70D0
-BALLXPOSITIONFIXED  2A70D4
-BALLXVELOCITY       2A70E0
-BALLYPOSITION       2A70D8
-BALLYPOSITIONFIXED  2A70DC
-BALLYVELOCITY       2A70E4
-BALL_HEIGHT         1E
+BALLJUSTCOLLIDED    2A6BCE
+BALLMOVED           2A6BCD
+BALLXPOSITION       2A6BD0
+BALLXPOSITIONFIXED  2A6BD4
+BALLXVELOCITY       2A6BE0
+BALLYPOSITION       2A6BD8
+BALLYPOSITIONFIXED  2A6BDC
+BALLYVELOCITY       2A6BE4
+BALL_HEIGHT         14
 BALL_INITIAL_X_POS  139
 BALL_INITIAL_Y_POS  2A
 BALL_INIT_X_VELOCITY  0
 BALL_INIT_Y_VELOCITY  0
-BALL_RADIUS         F
+BALL_RADIUS         A
 BALL_SLIDE_VELOCITY  250
-BALL_WIDTH          1E
+BALL_WIDTH          14
 BALL_Y_ACCELERATION  15
 BOARD_HEIGHT        270
 BOARD_WIDTH         1BC
 BOTTOM_RIGHT_BOARD_X_POS  2F5
 BOTTOM_RIGHT_BOARD_Y_POS  29A
-BOUNCEBALLOFFPEG    1584
-BOUNCEBALLOFFWALL   156E
-CHECKPEGCOLLISION   14D0
-CHECKPEGCOLLISION:CHECKDX  1522
-CHECKPEGCOLLISION:CHECKDY  1504
-CHECKPEGCOLLISION:CHECKEND  156C
-CHECKPEGCOLLISION:DIDNTCOLLIDE  156A
-CHECKPEGCOLLISION:SUBBALLXPEGX  151E
-CHECKPEGCOLLISION:SUBBALLYPEGY  1500
-CHECKWALLCOLLISION  14A8
-CHECKWALLCOLLISION:COLLIDED  14CC
-CHECKWALLCOLLISION:ENDCHECK  14CE
+BOUNCEBALLOFFPEG    159A
+BOUNCEBALLOFFPEG:NORANDVELX  1672
+BOUNCEBALLOFFPEG:NOTZEROSQRT  15EE
+BOUNCEBALLOFFPEG:NOXSOFTENING  166A
+BOUNCEBALLOFFWALL   158A
+CHECKPEGCOLLISION   14EC
+CHECKPEGCOLLISION:CHECKDX  153E
+CHECKPEGCOLLISION:CHECKDY  1520
+CHECKPEGCOLLISION:CHECKEND  1588
+CHECKPEGCOLLISION:DIDNTCOLLIDE  1586
+CHECKPEGCOLLISION:SUBBALLXPEGX  153A
+CHECKPEGCOLLISION:SUBBALLYPEGY  151C
+CHECKWALLCOLLISION  14C4
+CHECKWALLCOLLISION:COLLIDED  14E8
+CHECKWALLCOLLISION:ENDCHECK  14EA
 CHUNK_HEIGHT_STACK_OFFSET  4
 CHUNK_WIDTH_STACK_OFFSET  8
 CHUNK_X_POS_STACK_OFFSET  10
 CHUNK_Y_POS_STACK_OFFSET  C
-CLOSESTPEGX         2A7100
-CLOSESTPEGY         2A7104
+CLOSESTPEGX         2A6EB8
+CLOSESTPEGY         2A6EBC
 CURRENT_PEG_X_STACK_OFFSET  8
 CURRENT_PEG_Y_STACK_OFFSET  4
 DOUBLE_BUFFERING_MODE  11
-DRAWACHUNK          13CC
-DRAWALLBACKGROUND   1298
-DRAWBACKGROUNDCHUNK  12A6
-DRAWBACKGROUNDCHUNK:DONTDRAW  12BE
-DRAWBALL            12CE
-DRAWBALL:DONTDRAW   12E6
-DRAWBALLFIRSTTIME   12C0
-DRAWCOLUMN          1400
-DRAWEND             1458
-DRAWPIC             1378
+DRAWACHUNK          13E8
+DRAWALLBACKGROUND   12B4
+DRAWBACKGROUNDCHUNK  12C2
+DRAWBACKGROUNDCHUNK:DONTDRAW  12DA
+DRAWBALL            12EA
+DRAWBALL:DONTDRAW   1302
+DRAWBALLFIRSTTIME   12DC
+DRAWCOLUMN          141C
+DRAWEND             1474
+DRAWPIC             1394
 DRAW_A_PIXEL_COMMAND  52
 DRAW_X_POS_STACK_OFFSET  18
 DRAW_Y_POS_STACK_OFFSET  14
-DROPBALL            1098
-DROPBALLINPUT       1268
+DROPBALL            109E
+DROPBALLINPUT       1284
 EIGHT_TENTH         CD
-ENABLEDOUBLEBUFFER  145A
-ENDBALLUPDATE       1096
-ENDHANDLEINPUT      1266
+ENABLEDOUBLEBUFFER  1476
+ENDBALLUPDATE       109C
+ENDHANDLEINPUT      1282
 FALSE               0
 FIRST_PIXEL_ADDRESS_STACK_OFFSET  24
 FRACTION_BITS       8
-FRAMEBEGINTIME      2A70B8
-GAMELOOP            101E
-GETFIRSTPIXELADDRESS  1468
-GETIMAGEHEIGHT      1490
-GETIMAGEWIDTH       1480
+FRAMEBEGINTIME      2A6BB8
+GAMELOOP            1024
+GETABSOLUTEVALUE    1728
+GETFIRSTPIXELADDRESS  1484
+GETIMAGEHEIGHT      14AC
+GETIMAGEWIDTH       149C
+GETRANDOMNUMBER     16EC
+GETRANDOMNUMBER:NINC0  16FE
+GETRANDOMNUMBER:NINC1  1706
+GETRANDOMXVEL       1680
+GETRANDOMXVEL:ENDRAND  16E6
+GETRANDOMXVEL:MAKEVELNEGATIVE  16E2
+GETRANDOMXVEL:RANDFIRSTXVEL  16C2
 GET_TIME_COMMAND    8
 GREEN               FF00
 HALF                80
-HANDLEINPUT         1226
+HANDLEINPUT         1242
 IMAGE_HEIGHT_STACK_OFFSET  1C
 IMAGE_WIDTH_STACK_OFFSET  20
 INPUT_COMMAND       13
 LEFT_ARROW          25
 LEFT_ARROW_LOCATION  8
-LOOPCOUNTER         2A710C
+LOOPCOUNTER         2A6EC4
 MAIN                1000
-MIN_DX_TO_CHECK_COLLISION  18
-MIN_DY_TO_CHECK_COLLISION  18
-MOVEBALLTOLEFT      10A4
-MOVEBALLTOLEFT:DONTMOVE  10CE
-MOVEBALLTOLEFTINPUT  1276
-MOVEBALLTORIGHT     10D2
-MOVEBALLTORIGHT:DONTMOVE  10FC
-MOVEBALLTORIGHTINPUT  128A
-NEXTPIXEL           142C
-NUMBEROFPEGS        2A7108
+MAX_RAND_X_VELOCITY  199
+MIN_DX_TO_CHECK_COLLISION  11
+MIN_DY_TO_CHECK_COLLISION  11
+MIN_RAND_X_VELOCITY  100
+MIN_RAND_X_VEL_ALLOWED  150
+MOVEBALLTOLEFT      10AA
+MOVEBALLTOLEFT:DONTMOVE  10D4
+MOVEBALLTOLEFTINPUT  1292
+MOVEBALLTORIGHT     10D8
+MOVEBALLTORIGHT:DONTMOVE  1102
+MOVEBALLTORIGHTINPUT  12A6
+NEXTPIXEL           1448
+NUMBEROFPEGS        2A6EC0
 OFFSET_IMAGE_HEIGHT  16
 OFFSET_IMAGE_WIDTH  12
 OFFSET_TO_PIXEL_ARRAY  A
+ONE_FIFTEENTH       11
+ONE_FOURTH          40
 ONE_TENTH           1A
+ONE_THIRD           55
+ONE_TWENTIETH       D
 OUTPUT_WINDOW_HEIGHT  320
 OUTPUT_WINDOW_WIDTH  42F
-PAINTSCREENBUFFER   1462
-PEGSXS              2A70E8
-PEGSYS              2A70F4
-PEG_HEIGHT          E
-PEG_RADIUS          7
-PEG_WIDTH           E
-PLAYERINPUT         2A70B4
+PAINTSCREENBUFFER   147E
+PEGSXS              2A6BE8
+PEGSYS              2A6D50
+PEG_HEIGHT          A
+PEG_RADIUS          5
+PEG_WIDTH           A
+PLAYERINPUT         2A6BB4
+RAND                2A6EC8
+RANDOMIZEXVEL       1234
 REPAINT_SCREEN_COMMAND  5E
 RIGHT_ARROW         27
 RIGHT_ARROW_LOCATION  0
-SETBALLDRAWPARAMS   1342
-SETBGDRAWPARAMS     1310
-SETFIRSTDRAWPARAMS  12E8
+SEEDRANDOMNUMBER    171A
+SETBALLDRAWPARAMS   135E
+SETBGDRAWPARAMS     132C
+SETFIRSTDRAWPARAMS  1304
 SETFRAMEBEGINTIME   1204
-SETOUTPUTWINDOW     1050
+SETOUTPUTWINDOW     1056
+SETSOMEVARS         1226
 SET_DRAWING_MODE_COMMAND  5C
 SET_OUTPUT_WINDOW_COMMAND  21
 SET_PEN_COLOR_COMMAND  50
 SPACE_KEY           20
 SPACE_KEY_LOCATION  10
-SQRTS               276374
+SQRTS               275E74
 STACK_OFFSET_IN_PEG_COL  8
 STACK_OFFSET_WHEN_DRAWING  28
 START               1000
-SWAPBYTES           14A0
+SWAPBYTES           14BC
 TIME_PER_FRAME      1
 TOP_LEFT_BOARD_X_POS  139
 TOP_LEFT_BOARD_Y_POS  2A
 TRUE                1
-TWO_TENTH           33
-UPDATEBALLPOSITION  1062
+UPDATEBALLPOSITION  1068
 WAITTOENDFRAME      1210
 WAITTOENDFRAME:LOOPAGAIN  1216
+X_VELOCITY_SOFTNER  40
+Y_VELOCITY_SOFTNER  11

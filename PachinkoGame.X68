@@ -14,7 +14,8 @@ START  ORG    $1000
 
 Main:
     
-    jsr SetOutputWindow 
+    jsr SetOutputWindow
+    jsr SetSomeVars 
     jsr EnableDoubleBuffer
     jsr DrawAllBackground
     jsr DrawBallFirstTime
@@ -131,11 +132,11 @@ BallDropping:
 	cmp.b 	#(TRUE), (BallJustCollided)
     bne 	.JustWallCollided
 
-    jmp 	.ContinueBallUpdate
+    ;jmp 	.ContinueBallUpdate
 
 
 .MoveOnToPegs:
-    ;check collisions with pegs here *************************************
+    ;check collisions with pegs
 
     lea 	PegsXs, a1
 	lea 	PegsYs, a2
@@ -184,6 +185,9 @@ BallDropping:
 
 	move.b 	#(TRUE), (BallJustCollided)
 	jmp 	.DontMove
+	;jmp 	.ContinueBallUpdate
+	;jmp 	.MoveOnToPegs
+
 
 .JustPegCollided:	
 
@@ -192,12 +196,13 @@ BallDropping:
 
 	move.b 	#(TRUE), (BallJustCollided)
 	jmp 	.DontMove
+	;jmp 	.ContinueBallUpdate
 
 .ContinueBallUpdate:
 .SkipBounceOffPeg:
 
     cmp.l   #(BOTTOM_RIGHT_BOARD_Y_POS-BALL_HEIGHT), (BallYPosition)
-    bge     .DontMove ;reached destination, do something ***********************************
+    bge     .DontMove ;reached destination, do something **************************************************************
 
     ;update x pos
     move.l  (BallXPosition),d0
@@ -254,12 +259,28 @@ WaitToEndFrame:
 
     rts
 
+SetSomeVars:
+
+	jsr 	SeedRandomNumber
+	jsr 	RandomizeXVel
+
+	rts
+
+
+RandomizeXVel:
+
+	jsr 	GetRandomXVel
+	move.l 	d0, (BallXVelocity)
+
+	rts
 
 
 
     include "InputHandler.x68"
     include "drawingModule.X68"
     include	"CollisionModule.x68"
+    include	"RandomNumberGenerator.x68"
+    include	"Math.x68"
 
 
 
@@ -288,16 +309,48 @@ BallYPositionFixed  dc.l    (BALL_INITIAL_Y_POS<<FRACTION_BITS)
 BallXVelocity       dc.l    (BALL_INIT_X_VELOCITY)
 BallYVelocity       dc.l    (BALL_INIT_Y_VELOCITY)
 
-PegsXs				dc.l 	538, 458, 589
-PegsYs				dc.l 	309, 354, 219
+PegsXs				;dc.l 	356, 407, 458, 509, 560, 612, 663, 714 			
+					dc.l 	384, 435, 486, 538, 589, 640, 691
+					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
+					dc.l 	384, 435, 486, 538, 589, 640, 691
+					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
+					dc.l 	384, 435, 486, 538, 589, 640, 691
+					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
+					dc.l 	384, 435, 486, 538, 589, 640, 691
+					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
+					dc.l 	384, 435, 486, 538, 589, 640, 691
+					dc.l 	356, 407, 458, 509, 560, 612, 663, 714
+					dc.l 	384, 435, 486, 538, 589, 640, 691
+					dc.l 	356, 407, 458, 509, 560, 612, 663, 714     		; for the lower part of the board
+
+
+PegsYs				;dc.l 	84, 84, 84, 84, 84, 84, 84, 84
+					dc.l 	129, 129, 129, 129, 129, 129, 129
+					dc.l 	174, 174, 174, 174, 174, 174, 174, 174
+					dc.l 	219, 219, 219, 219, 219, 219, 219
+					dc.l 	264, 264, 264, 264, 264, 264, 264, 264
+					dc.l 	309, 309, 309, 309, 309, 309, 309
+					dc.l 	354, 354, 354, 354, 354, 354, 354, 354
+					dc.l 	399, 399, 399, 399, 399, 399, 399
+					dc.l 	444, 444, 444, 444, 444, 444, 444, 444
+					dc.l 	489, 489, 489, 489, 489, 489, 489
+					dc.l 	534, 534, 534, 534, 534, 534, 534, 534
+					dc.l 	580, 580, 580, 580, 580, 580, 580
+					dc.l 	653, 653, 653, 653, 653, 653, 653, 653			; for the lower part of the board			
+
 ClosestPegX			dc.l 	0
 ClosestPegY			dc.l 	0
 NumberOfPegs		dc.l 	(PegsYs-PegsXs)
 LoopCounter			dc.l 	0
 
+Rand 				ds.l 	1
+
     END    START
 
         
+
+
+
 
 
 

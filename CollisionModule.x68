@@ -1,4 +1,4 @@
-;Collision stuff file
+;Collision related logic
 
 CheckWallCollision:
 
@@ -114,10 +114,11 @@ CheckPegCollision:
 
 
 BounceBallOffWall:
+	
 
 	move.l 	(BallXVelocity), d0
-	muls.w 	#(HALF), d0		
-    asr.l   #(FRACTION_BITS),d0		;soften collision
+	;muls.w 	#(HALF), d0		
+    ;asr.l   #(FRACTION_BITS),d0		;soften collision
 
     neg.l 	d0
     move.l 	d0, (BallXVelocity)
@@ -133,8 +134,8 @@ BounceBallOffPeg:
 	sub.l 	(BallYPosition), d0		
 	add.l 	#(BALL_RADIUS), d0		;d0 = tgX = Ypeg - Yball
 	move.l 	(BallXPosition), d1
-	sub.l 	(ClosestPegX), d1		
-	add.l 	#(BALL_RADIUS), d1		;d1 = tgY = Xball - Xpeg
+	add.l 	#(BALL_RADIUS), d1		
+	sub.l 	(ClosestPegX), d1		;d1 = tgY = Xball - Xpeg
 
 
 	;get vect length
@@ -160,6 +161,14 @@ BounceBallOffPeg:
 	move.l 	d0, d2					;d2 bytes are swapped, so it has the correct sqrt
 	move.l 	d7, d0					;restore d0
 
+	cmp.l 	#0, d2
+	bne 	.NotZeroSqrt
+
+	; to avoid div by 0
+	move.l 	#1, d2
+
+
+.NotZeroSqrt:	
 
 	;get normalized tangent
 	divs.w 	d2, d0					;Xtg
@@ -217,21 +226,88 @@ BounceBallOffPeg:
 	sub.l 	d0, d2					;d2 = NewXvel = Xvel - 2 * Xper
 	sub.l 	d1, d3					;d3 = NewYvel = Yvel - 2 * Yper
 
-	muls.w 	#(HALF), d2		;soften collision
+    muls.w 	#(Y_VELOCITY_SOFTNER), d3
+    asr.l   #(FRACTION_BITS),d3			;soften y velocity
+
+    ;get the abs to test on it
+    move.l 	d2, d1
+
+    jsr 	GetAbsoluteValue			;abs will be in d0
+
+    cmp.l 	#(MIN_RAND_X_VEL_ALLOWED),d0		
+    blt 	.NoXSoftening
+
+    muls.w 	#(X_VELOCITY_SOFTNER), d2	;soften x velocity
     asr.l   #(FRACTION_BITS),d2	
-    muls.w 	#(ONE_TENTH), d3
-    asr.l   #(FRACTION_BITS),d3
+
+    jmp 	.NoRandVelX
 
 
+.NoXSoftening:
+
+	jsr 	GetRandomXVel
+
+	move.l 	d0, d2
+
+
+.NoRandVelX:
 	;update the velocity
 	move.l 	d2, (BallXVelocity)
 	move.l 	d3, (BallYVelocity)
 
 
+	rts	
+
+
+GetRandomXVel:
+							
+    movem.l d1,-(sp)
+
+	jsr GetRandomNumber
+
+	and.l 	#(MAX_RAND_X_VELOCITY), d0
+	add.l 	#(MIN_RAND_X_VELOCITY), d0 	;between min and max
+
+	;on first drop
+	cmp.l 	#(FALSE), (BallDropped)
+	beq 	.RandFirstXVel
+
+	;decide if negative or positive based on the ball x position compared to peg
+	move.l 	(BallXPosition), d1
+	sub.l 	(ClosestPegX), d1
+
+	cmp.l 	#0, d1
+	bge 	.EndRand
+	;go right else go left
+
+	neg.l 	d0
+
+	jmp 	.EndRand
+
+.RandFirstXVel:
+	move.l 	d0, d1			;store rand
+
+	jsr GetRandomNumber		; get new rand
+
+	and.l 	#1, d0
+
+	cmp.l 	#0, d0
+	bne 	.MakeVelNegative	
+	;go right
+	move.l 	d1, d0			;restore pos rand
+
+	jmp 	.EndRand
+
+.MakeVelNegative: 			;go left
+
+	neg.l 	d1
+	move.l 	d1, d0			;restore neg rand
+
+.EndRand:
+
+	movem.l (sp)+,d1
+
 	rts
-
-
-
 
 
 
