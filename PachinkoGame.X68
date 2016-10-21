@@ -21,6 +21,7 @@ Main:
     jsr DrawAllBackground
     jsr DrawBallFirstTime
     jsr UpdateScoreLed
+    jsr UpdateBallsLed
     jsr PaintScreenBuffer
     
 GameLoop:
@@ -314,7 +315,8 @@ RestartGame:
 	jsr OverrideScore
 	jsr UpdateScoreLed
 
-
+	jsr OverrideBalls
+	jsr UpdateBallsLed
 
     jmp   	EndBallUpdate
 
@@ -437,6 +439,9 @@ HaveToRestart 		dc.l 	(FALSE)
 LedDigitsTable 		dc.b 	$3f, $06,$5b, $4f, $66, $6d, $7d, $07, $7f, $67
 CurrentLedStartX 	dc.l  	0
 CurrentLedStartY 	dc.l  	0
+BallsLedStartX 		dc.l  	0
+BallsLedStartY 		dc.l  	0
+
 
 UsedBalls 			dc.l 	0
 
@@ -448,6 +453,7 @@ EndScoresInGame
     END    START
 
         
+
 
 
 

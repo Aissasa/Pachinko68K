@@ -41,6 +41,47 @@ UpdateScoreLed:
 	rts
 
 
+UpdateBallsLed:
+
+	move.l 	(UsedBalls), d0
+
+	jsr 	GetDigits
+
+	; display digits
+	;set pen color
+	move.l 	#(SET_PEN_COLOR_COMMAND), d0
+	move.l 	#(WHITE), d1
+	Trap 	#15
+
+	;begin drawing third digit
+	lea 	LedDigitsTable, a6
+	move.b 	(a6, d7), d0
+	;update start pos			
+	move.l 	#(BALLS_LED_START_X), (BallsLedStartX)
+	move.l 	#(BALLS_LED_START_Y), (BallsLedStartY)
+
+	jsr DrawDigit
+
+	;draw second digit
+	move.b 	(a6, d6), d0
+	;update start pos			
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), (BallsLedStartX)
+	add.l 	#(BALLS_LED_DIGIT_OFFSET), (BallsLedStartY)
+
+	jsr DrawDigit
+
+	;draw third digit
+	move.b 	(a6, d5), d0
+	;update start pos			
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), (BallsLedStartX)
+	add.l 	#(BALLS_LED_DIGIT_OFFSET), (BallsLedStartY)
+
+	jsr DrawDigitBl
+
+
+	rts	
+
+
 ;params: d0: the number, returns d5: first digit, d6, second digit, d7: third digit
 GetDigits:
 
@@ -278,6 +319,202 @@ DrawDigit:
 
 
 	jmp .DrawGBack
+
+
+DrawDigitBl:
+
+	movem.l 	ALL_REG, -(sp)
+
+	move.b 	d0, d6
+	move.b 	d6, d7
+	and.b 	#1, d7
+	cmp.b 	#1, d7
+	beq 	.DrawABl
+
+.DrawABackBl:
+	
+	lsr.b 	#1, d6
+	move.b 	d6, d7
+	and.b 	#1, d7
+	cmp.b 	#1, d7
+	beq 	.DrawBBl
+
+
+.DrawBBackBl:	
+
+	lsr.b 	#1, d6
+	move.b 	d6, d7
+	and.b 	#1, d7
+	cmp.b 	#1, d7
+	beq 	.DrawCBl
+
+
+
+.DrawCBackBl:	
+
+	lsr.b 	#1, d6
+	move.b 	d6, d7
+	and.b 	#1, d7
+	cmp.b 	#1, d7
+	beq 	.DrawDBl
+
+.DrawDBackBl:	
+
+	lsr.b 	#1, d6
+	move.b 	d6, d7
+	and.b 	#1, d7
+	cmp.b 	#1, d7
+	beq 	.DrawEBl
+
+.DrawEBackBl:	
+
+	lsr.b 	#1, d6
+	move.b 	d6, d7
+	and.b 	#1, d7
+	cmp.b 	#1, d7
+	beq 	.DrawFBl
+
+.DrawFBackBl:	
+
+	lsr.b 	#1, d6
+	move.b 	d6, d7
+	and.b 	#1, d7
+	cmp.b 	#1, d7
+	beq 	.DrawGBl
+
+.DrawGBackBl:		
+
+	
+	movem.l 	(sp)+, ALL_REG, 
+
+	rts
+
+.DrawABl:	
+
+	; set points
+	move.l 	(BallsLedStartX), d1
+	move.l 	(BallsLedStartY), d2
+	move.l 	(BallsLedStartX), d3
+	move.l 	(BallsLedStartY), d4
+
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), d3
+
+	;draw line
+	move.l 	#(DRAW_LINE_COMMAND), d0
+	Trap 	#15
+
+	jmp .DrawABackBl
+
+.DrawBBl:	
+	
+	; set points
+	move.l 	(BallsLedStartX), d1
+	move.l 	(BallsLedStartY), d2
+	move.l 	(BallsLedStartX), d3
+	move.l 	(BallsLedStartY), d4
+
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), d1
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), d3
+	add.l 	#(BALLS_LED_LINE_HEIGHT), d4
+
+	;draw line
+	move.l 	#(DRAW_LINE_COMMAND), d0
+	Trap 	#15
+
+	jmp .DrawBBackBl
+
+.DrawCBl:	
+
+	; set points
+	move.l 	(BallsLedStartX), d1
+	move.l 	(BallsLedStartY), d2
+	move.l 	(BallsLedStartX), d3
+	move.l 	(BallsLedStartY), d4
+
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), d1
+	add.l 	#(BALLS_LED_LINE_HEIGHT), d2
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), d3
+	add.l 	#(BALLS_LED_DIGIT_HEIGHT), d4
+
+	;draw line
+	move.l 	#(DRAW_LINE_COMMAND), d0
+	Trap 	#15
+
+
+	jmp .DrawCBackBl
+
+.DrawDBl:	
+
+	; set points
+	move.l 	(BallsLedStartX), d1
+	move.l 	(BallsLedStartY), d2
+	move.l 	(BallsLedStartX), d3
+	move.l 	(BallsLedStartY), d4
+
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), d1
+	add.l 	#(BALLS_LED_DIGIT_HEIGHT), d2
+	add.l 	#(BALLS_LED_DIGIT_HEIGHT), d4
+
+	;draw line
+	move.l 	#(DRAW_LINE_COMMAND), d0
+	Trap 	#15
+
+
+	jmp .DrawDBackBl
+
+.DrawEBl:	
+
+	; set points
+	move.l 	(BallsLedStartX), d1
+	move.l 	(BallsLedStartY), d2
+	move.l 	(BallsLedStartX), d3
+	move.l 	(BallsLedStartY), d4
+
+	add.l 	#(BALLS_LED_DIGIT_HEIGHT), d2
+	add.l 	#(BALLS_LED_LINE_HEIGHT), d4
+
+	;draw line
+	move.l 	#(DRAW_LINE_COMMAND), d0
+	Trap 	#15
+
+
+	jmp .DrawEBackBl
+
+.DrawFBl:	
+
+	; set points
+	move.l 	(BallsLedStartX), d1
+	move.l 	(BallsLedStartY), d2
+	move.l 	(BallsLedStartX), d3
+	move.l 	(BallsLedStartY), d4
+
+	add.l 	#(BALLS_LED_LINE_HEIGHT), d2
+
+	;draw line
+	move.l 	#(DRAW_LINE_COMMAND), d0
+	Trap 	#15
+
+
+	jmp .DrawFBackBl
+
+.DrawGBl:	
+
+	; set points
+	move.l 	(BallsLedStartX), d1
+	move.l 	(BallsLedStartY), d2
+	move.l 	(BallsLedStartX), d3
+	move.l 	(BallsLedStartY), d4
+
+	add.l 	#(BALLS_LED_LINE_HEIGHT), d2
+	add.l 	#(BALLS_LED_DIGIT_WIDTH), d3
+	add.l 	#(BALLS_LED_LINE_HEIGHT), d4
+
+	;draw line
+	move.l 	#(DRAW_LINE_COMMAND), d0
+	Trap 	#15
+
+
+	jmp .DrawGBackBl
 
 
 

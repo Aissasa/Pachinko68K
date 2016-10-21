@@ -39,6 +39,14 @@ OverrideScore:
 
     rts    
 
+OverrideBalls:
+
+    ;override the score
+    jsr SetBgDrawParamsBl
+    jsr DrawPic
+
+    rts      
+
 DrawBallFirstTime:
 
     move.b  #(TRUE), (BallMoved)
@@ -122,6 +130,32 @@ SetBgDrawParamsSc:
                
     
     rts
+
+SetBgDrawParamsBl:
+
+    lea BackgroundBitmap, a0
+
+    ;set draw start position   
+    move.l  #(BALLS_LED_START_Y_OVER),d1           
+    add.l   #(BALLS_LED_DIGIT_HEIGHT_OV),d1    ;y
+    swap    d1
+    add.l  #(BALLS_LED_START_X_OVER),d1         ;x  
+
+    
+    ;set chunk start position
+    move.l  #(BALLS_LED_START_Y_OVER),d2          ;y    
+    swap    d2
+    add.l  #(BALLS_LED_START_X_OVER),d2           ;x
+
+    ;set chunk width and height
+    move.l  #(BALLS_LED_DIGIT_WIDTH_OV),d3     
+    swap    d3
+    move.w  #(BALLS_LED_DIGIT_HEIGHT_OV),d3
+               
+    
+    rts
+
+
 
 SetBallDrawParams:
 
